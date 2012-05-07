@@ -3,7 +3,7 @@ chrome.extension.onRequest.addListener(
 
         var notification = window.webkitNotifications.createNotification(
             'icon32.png', // The image.
-            'shortcuts found - ' + request.url, // The title.
+            'Shortcuts found - ' + request.url, // The title.
              request.msg // The body.
         );
         notification.show();
