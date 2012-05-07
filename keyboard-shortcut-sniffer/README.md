@@ -22,4 +22,6 @@ Mac OS X: [Ctrl + Alt + accesskey]
 [Access Keys Wikipedia Article](http://en.wikipedia.org/wiki/Access_key - Wikipedia)
 
 ## TODO
-* Order found shortcuts better. Arrow keys should appear together.
+* Order found shortcuts. Arrow keys should appear together.
+* Add a function to test found shortcuts.
+* Detect '?', a common keybinding containing 'shortcut -> action' mappings.
