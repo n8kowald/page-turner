@@ -1,5 +1,9 @@
 .ekW7J {
-  position:fixed !important;
-  top:102px !important;
-  z-index:9999999 !important;
+    position:fixed !important;
+    top:102px !important;
+    z-index:999 !important;
+}
+.vXfGh {
+    position:relative !important;
+    z-index:1002 !important;
 }
