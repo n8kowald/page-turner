@@ -19,7 +19,7 @@ Windows:  [Alt + accesskey]
 Mac OS X: [Ctrl + Alt + accesskey]  
 
 ### Demo  
-[Access Keys Wikipedia Article](http://en.wikipedia.org/wiki/Access_key - Wikipedia)
+[Access Keys Wikipedia Article](http://en.wikipedia.org/wiki/Access_keys - Wikipedia)
 
 ## TODO
 * Order found shortcuts. Arrow keys should appear together.

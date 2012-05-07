@@ -1,7 +1,7 @@
 {
-  "name": "Google+ Changer",
+  "name": "Google+ Fixed Circlebar",
   "version": "1.0",
-  "description": "Interface edits to Google+",
+  "description": "Keeps the circlebar fixed in Google+",
   "content_scripts": [
     {
       "matches": ["http://plus.google.com/*", "https://plus.google.com/*"],

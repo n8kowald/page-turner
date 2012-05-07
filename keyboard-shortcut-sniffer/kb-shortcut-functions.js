@@ -82,12 +82,14 @@ jQ(document).ready(function() {
     mappings[191] = "&#47;";
     mappings[220] = "&#92;";
     // Another way of setting keyboard shortcuts
+    /*
     mappings['KEY_LEFT'] = "&larr;";
     mappings['KEY_RIGHT'] = "&rarr;";
     mappings['KEY_UP'] = "&uarr;";
     mappings['KEY_DOWN'] = "&darr;";
     mappings['KEY_TAB'] = "Tab";
     mappings['KEY_DELETE'] = "Delete";
+    */
     //mappings['KEY_RETURN'] = "&darr;";
     //mappings['KEY_ESC'] = "&darr;";
     
