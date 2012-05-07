@@ -1,0 +1,17 @@
+{
+  "name": "Google+ Changer",
+  "version": "1.0",
+  "description": "Interface edits to Google+",
+  "content_scripts": [
+    {
+      "matches": ["http://plus.google.com/*", "https://plus.google.com/*"],
+      "js": ["jquery.js", "functions.js"],
+      "css": ["styles.css"]
+    }
+  ],
+  "permissions": [
+    "tabs",
+    "http://*/*",
+    "http://*/*"
+  ]
+}
