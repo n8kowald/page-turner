@@ -7,7 +7,7 @@ jQ(document).ready(function() {
     var next_link = '';
 
     // If link starts with #, append this to current url
-    function sanitise_link(link) {
+    function sanitiseLink(link) {
         var cur_url = document.URL;
         if (link.charAt(0) == '#') {
             // strip existing anchors
@@ -21,7 +21,7 @@ jQ(document).ready(function() {
         return link;
     }
 
-    function setIcon() {
+    function getIcon() {
         var icon = 'icon-inactive.png';
         if (back_link != '') {
             if (next_link != '') {
@@ -53,29 +53,51 @@ jQ(document).ready(function() {
         return click_icon;
     }
 
-    function search_for_links(type) {
-        if (type == 'back') {
-           names = back_names; 
-        } else if (type == 'next') {
-           names = next_names; 
+    function inArray(needle, haystack) {
+        var length = haystack.length;
+        for(var i = 0; i < length; i++) {
+            if (haystack[i] == needle) return true;
         }
+        return false;
+    }
+
+    function getTypeFromWord(word) {
+        if (inArray(word, back_names)) {
+            return 'back';
+        } else if (inArray(word, next_names)) {
+            return 'next';   
+        }
+        return false;
+    }
+
+    function setLink(type, link) {
+        if (type == 'back') {
+            if (back_link != '') return;
+            back_link = sanitiseLink(link);
+        } else if (type == 'next') {
+            if (next_link != '') return;
+            next_link = sanitiseLink(link);
+        }
+    }
+
+    function searchForLinks() {
+        // combine back and next words
+        var all_words = back_names.concat(next_names); 
         // Search last links first
         jQ(jQ('a').get().reverse()).each(function(){
             var link_text = jQ(this).text();
             link_text = jQ.trim(link_text.replace(/[^a-z ]/i, ''));
-            // only use first word
+            // match on first word
             var word = link_text.split(' ')[0];
-            for (i=0; i < names.length; i++) {
-                var regex = new RegExp('^' + names[i] + '$', 'i');
-                if (word.match(regex)) {
-                    jQ(this).css('border', '2px solid red');
-                    jQ(this).css('background-color', 'yellow');
-                    // we've found: exit
-                    if (type == 'back') {
-                        back_link = sanitise_link(jQ(this).attr('href'));
-                    } else if (type == 'next') {
-                        next_link = sanitise_link(jQ(this).attr('href'));
-                    }
+            if (word == '') return true;
+            word = word.toLowerCase();
+            if (inArray(word, all_words)) {
+                jQ(this).css('border', '2px solid red');
+                jQ(this).css('background-color', 'yellow');
+                var type = getTypeFromWord(word);
+                setLink(type, jQ(this).attr('href'));
+                // if back AND next links found: exit loop, we're done here
+                if (back_link != '' && next_link != '') { 
                     return false;
                 }
             }
@@ -87,15 +109,20 @@ jQ(document).ready(function() {
         chrome.extension.sendRequest({icon: icon});
     }
 
-    search_for_links('back');
-    search_for_links('next');
+    // find links
+    searchForLinks();
 
-    icon = setIcon();
+    // determine icon
+    icon = getIcon();
+
+    // update extension icon
     updateIcon(icon);
 
     //console.log('Back: ' + back_link);
     //console.log('Next: ' + next_link);
 
+
+    // setup keyboard shortcuts for back/next links
     jQ(document).keydown(function(e) {
 
         if (back_link != '') {
