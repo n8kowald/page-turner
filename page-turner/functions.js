@@ -83,23 +83,25 @@ jQ(document).ready(function() {
     function searchForLinks() {
         // combine back and next words
         var all_words = back_names.concat(next_names); 
+
         // Search last links first
         jQ(jQ('a').get().reverse()).each(function(){
             var link_text = jQ(this).text();
             link_text = jQ.trim(link_text.replace(/[^a-z ]/i, ''));
             // match on first word
             var word = link_text.split(' ')[0];
-            if (word == '') return true;
+            if (word == '') return true; // continue
             word = word.toLowerCase();
-            if (inArray(word, all_words)) {
-                jQ(this).css('border', '2px solid red');
-                jQ(this).css('background-color', 'yellow');
-                var type = getTypeFromWord(word);
-                setLink(type, jQ(this).attr('href'));
-                // if back AND next links found: exit loop, we're done here
-                if (back_link != '' && next_link != '') { 
-                    return false;
-                }
+            if (!inArray(word, all_words)) return true; // continue
+
+            // Found!
+            jQ(this).css({'border':'2px solid red','background-color':'yellow'});
+            var type = getTypeFromWord(word);
+            setLink(type, jQ(this).attr('href'));
+
+            // if back AND next links found: exit loop, we're done here
+            if (back_link != '' && next_link != '') { 
+                return false; // break
             }
         });
     }
@@ -121,24 +123,23 @@ jQ(document).ready(function() {
     //console.log('Back: ' + back_link);
     //console.log('Next: ' + next_link);
 
+    var click_icon = '';
 
     // setup keyboard shortcuts for back/next links
     jQ(document).keydown(function(e) {
 
-        if (back_link != '') {
-            if(e.keyCode == 37) {
-                var click_icon = setClickIcon(icon, 'back');
-                updateIcon(click_icon);
-                document.location = back_link;
-            }
+        // left arrow
+        if (back_link != '' && e.keyCode == 37) {
+            click_icon = setClickIcon(icon, 'back');
+            updateIcon(click_icon);
+            document.location = back_link;
         }
 
-        if (next_link != '') {
-            if (e.keyCode == 39) {
-                var click_icon = setClickIcon(icon, 'next');
-                updateIcon(click_icon);
-                document.location = next_link;
-            }	   
+        // right arrow
+        if (next_link != '' && e.keyCode == 39) {
+            click_icon = setClickIcon(icon, 'next');
+            updateIcon(click_icon);
+            document.location = next_link;
         }
 
 	});
