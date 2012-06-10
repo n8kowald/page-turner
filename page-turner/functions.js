@@ -6,6 +6,13 @@ jQ(document).ready(function() {
     var back_link = '';
     var next_link = '';
 
+    function inArray(needle, haystack) {
+        for(var i = 0; i < haystack.length; i++) {
+            if (haystack[i] == needle) return true;
+        }
+        return false;
+    }
+
     // If link starts with #, append this to current url
     function sanitiseLink(link) {
         var cur_url = document.URL;
@@ -53,13 +60,6 @@ jQ(document).ready(function() {
         return click_icon;
     }
 
-    function inArray(needle, haystack) {
-        var length = haystack.length;
-        for(var i = 0; i < length; i++) {
-            if (haystack[i] == needle) return true;
-        }
-        return false;
-    }
 
     function getTypeFromWord(word) {
         if (inArray(word, back_names)) {
@@ -79,6 +79,14 @@ jQ(document).ready(function() {
         }
     }
 
+    function linkFound(type) {
+        if (type == 'back') {
+            return back_link != '';    
+        } else if (type == 'next') {
+           return next_link != ''; 
+        }
+    }
+
     function searchForLinks() {
         // combine back and next words
         var all_words = back_names.concat(next_names); 
@@ -94,9 +102,13 @@ jQ(document).ready(function() {
             if (!inArray(word, all_words)) return true; // continue
 
             // Found!
-            jQ(this).css({'border':'2px solid red','background-color':'yellow'});
             var type = getTypeFromWord(word);
-            setLink(type, jQ(this).attr('href'));
+
+            // Highlight and set found link - if not set already
+            if (!linkFound(type)) {
+                jQ(this).css({'border':'2px solid red','background-color':'yellow'});
+                setLink(type, jQ(this).attr('href'));
+            }
 
             // if back AND next links found: exit loop, we're done here
             if (back_link != '' && next_link != '') { 
@@ -125,7 +137,7 @@ jQ(document).ready(function() {
     var click_icon = '';
 
 
-    // setup keyboard shortcuts for back/next links
+    // set keyboard shortcuts for back/next links
     jQ(document).keydown(function(e) {
         // left arrow
         if (back_link != '' && e.keyCode == 37) {
