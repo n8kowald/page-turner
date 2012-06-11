@@ -97,7 +97,8 @@ jQ(document).ready(function() {
             link_text = jQ.trim(link_text.replace(/[^a-z ]/i, ''));
             if (link_text == '') return true; // continue
             var words = link_text.split(' ');
-            // Links with more than two words are probably not pagination
+            // Links with more than two words are probably not pagination 
+            // could even change to one word: requires moar testing
             if (words.length > 2) return true; // continue
             // match on first word
             var word = words[0].toLowerCase();
@@ -105,7 +106,6 @@ jQ(document).ready(function() {
 
             // Found!
             var type = getTypeFromWord(word);
-
             // Highlight and set found link (if not set already)
             if (!linkFound(type)) {
                 jQ(this).css({'background-color':'yellow'});
