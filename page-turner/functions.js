@@ -95,18 +95,20 @@ jQ(document).ready(function() {
         jQ(jQ('a').get().reverse()).each(function(){
             var link_text = jQ(this).text();
             link_text = jQ.trim(link_text.replace(/[^a-z ]/i, ''));
+            if (link_text == '') return true; // continue
+            var words = link_text.split(' ');
+            // Links with more than two words are probably not pagination
+            if (words.length > 2) return true; // continue
             // match on first word
-            var word = link_text.split(' ')[0];
-            if (word == '') return true; // continue
-            word = word.toLowerCase();
+            var word = words[0].toLowerCase();
             if (!inArray(word, all_words)) return true; // continue
 
             // Found!
             var type = getTypeFromWord(word);
 
-            // Highlight and set found link - if not set already
+            // Highlight and set found link (if not set already)
             if (!linkFound(type)) {
-                jQ(this).css({'border':'0 solid red','background-color':'yellow'});
+                jQ(this).css({'background-color':'yellow'});
                 setLink(type, jQ(this).attr('href'));
             }
 
@@ -135,7 +137,6 @@ jQ(document).ready(function() {
     //console.log('Next: ' + next_link);
 
     var click_icon = '';
-
 
     // set keyboard shortcuts for back/next links
     jQ(document).keydown(function(e) {
