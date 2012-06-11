@@ -16,7 +16,7 @@ jQ(document).ready(function() {
     // If link starts with #, append this to current url
     function sanitiseLink(link) {
         var cur_url = document.URL;
-        if (link.charAt(0) == '#') {
+        if (typeof link != 'undefined' && link.charAt(0) == '#') {
             // strip existing anchors
             if (cur_url.indexOf('#') != -1) {
                 var stripped = cur_url.substr(0, cur_url.indexOf('#'));
@@ -70,10 +70,10 @@ jQ(document).ready(function() {
     }
 
     function setLink(type, link) {
-        if (type == 'back') {
+        if (typeof link != 'undefined' && type == 'back') {
             if (back_link != '') return;
             back_link = sanitiseLink(link);
-        } else if (type == 'next') {
+        } else if (typeof link != 'undefined' && type == 'next') {
             if (next_link != '') return;
             next_link = sanitiseLink(link);
         }
@@ -106,7 +106,7 @@ jQ(document).ready(function() {
 
             // Highlight and set found link - if not set already
             if (!linkFound(type)) {
-                jQ(this).css({'border':'2px solid red','background-color':'yellow'});
+                jQ(this).css({'border':'0 solid red','background-color':'yellow'});
                 setLink(type, jQ(this).attr('href'));
             }
 
