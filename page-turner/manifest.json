@@ -1,7 +1,7 @@
 {
   "name": "Page Turner", 
   "version": "1.0",
-  "description": "Control pagination using the left/right arrow keys",
+  "description": "Makes it easy to browse through paginated webpages using your keyboard arrow keys. Perfect for search results, image galleries and more.",
   "browser_action": { "default_icon": "icons/icon-inactive.png" },
   "permissions": ["tabs"],
   "icons": {

@@ -70,6 +70,7 @@ jQ(document).ready(function() {
     }
 
     function setLink(type, link) {
+        if (link == '#') return; // A single hash is not a valid link (requires JavaScript)
         if (typeof link != 'undefined' && type == 'back') {
             if (back_link != '') return;
             back_link = sanitiseLink(link);
@@ -79,7 +80,7 @@ jQ(document).ready(function() {
         }
     }
 
-    function linkFound(type) {
+    function linkTypeExists(type) {
         if (type == 'back') {
             return back_link != '';    
         } else if (type == 'next') {
@@ -107,9 +108,12 @@ jQ(document).ready(function() {
             // Found!
             var type = getTypeFromWord(word);
             // Highlight and set found link (if not set already)
-            if (!linkFound(type)) {
-                jQ(this).css({'background-color':'yellow'});
-                setLink(type, jQ(this).attr('href'));
+            if (!linkTypeExists(type)) {
+                var link = jQ(this).attr('href');
+                if (typeof link != 'undefined') {
+                    jQ(this).css({'background-color':'yellow'});
+                    setLink(type, link);
+                }
             }
 
             // if back AND next links found: exit loop, we're done here
