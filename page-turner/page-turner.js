@@ -144,17 +144,23 @@ jQ(document).ready(function() {
 
     // set keyboard shortcuts for back/next links
     jQ(document).keydown(function(e) {
-        // left arrow
-        if (back_link != '' && e.keyCode == 37) {
-            click_icon = setClickIcon(icon, 'back');
-            updateIcon(click_icon);
-            document.location = back_link;
-        }
-        // right arrow
-        if (next_link != '' && e.keyCode == 39) {
-            click_icon = setClickIcon(icon, 'next');
-            updateIcon(click_icon);
-            document.location = next_link;
+
+        // Detect context. Don't want left/right keys to work if we're inside a form input
+        if (document.activeElement instanceof HTMLBodyElement) {
+
+            // left arrow
+            if (back_link != '' && e.keyCode == 37) {
+                click_icon = setClickIcon(icon, 'back');
+                updateIcon(click_icon);
+                document.location = back_link;
+            }
+            // right arrow
+            if (next_link != '' && e.keyCode == 39) {
+                click_icon = setClickIcon(icon, 'next');
+                updateIcon(click_icon);
+                document.location = next_link;
+            }
+
         }
     });
 

@@ -12,6 +12,6 @@
   "background": { "scripts": ["background.js"] },
   "content_scripts": [{
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["jquery.js", "functions.js"]
+      "js": ["jquery.js", "page-turner.js"]
   }]
 }
