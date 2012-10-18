@@ -3,7 +3,7 @@ jQ(document).ready(function() {
 
     var back_names = ['back', 'previous', 'prev']; 
     var next_names = ['next', 'forward']; 
-    var back_link = '';
+    var back_link = '',
     var next_link = '';
 
     Array.prototype.inArray = function(needle) {
@@ -156,22 +156,21 @@ jQ(document).ready(function() {
     jQ(document).keydown(function(e) {
 
         // Detect context. Don't want left/right keys to work if we're inside a form input
-        if (document.activeElement instanceof HTMLBodyElement) {
+        if (!document.activeElement instanceof HTMLBodyElement) return;
 
-            // left arrow
-            if (back_link != '' && e.keyCode == 37) {
-                click_icon = setClickIcon(icon, 'back');
-                updateIcon(click_icon);
-                document.location = back_link;
-            }
-            // right arrow
-            if (next_link != '' && e.keyCode == 39) {
-                click_icon = setClickIcon(icon, 'next');
-                updateIcon(click_icon);
-                document.location = next_link;
-            }
-
+        // left arrow
+        if (back_link != '' && e.keyCode == 37) {
+            click_icon = setClickIcon(icon, 'back');
+            updateIcon(click_icon);
+            document.location = back_link;
         }
+        // right arrow
+        if (next_link != '' && e.keyCode == 39) {
+            click_icon = setClickIcon(icon, 'next');
+            updateIcon(click_icon);
+            document.location = next_link;
+        }
+
     });
 
 });
