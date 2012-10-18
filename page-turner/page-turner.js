@@ -1,14 +1,14 @@
 var jQ = jQuery.noConflict();
 jQ(document).ready(function() {
 
-    var back_names = new Array('back', 'previous', 'prev'); 
-    var next_names = new Array('next', 'forward'); 
+    var back_names = ['back', 'previous', 'prev']; 
+    var next_names = ['next', 'forward']; 
     var back_link = '';
     var next_link = '';
 
-    function inArray(needle, haystack) {
-        for(var i = 0; i < haystack.length; i++) {
-            if (haystack[i] == needle) return true;
+    Array.prototype.inArray = function(needle) {
+        for(var i = 0; i < this.length; i++) {
+            if (this[i] == needle) return true;
         }
         return false;
     }
@@ -62,9 +62,9 @@ jQ(document).ready(function() {
 
 
     function getTypeFromWord(word) {
-        if (inArray(word, back_names)) {
+        if (back_names.inArray(word)) {
             return 'back';
-        } else if (inArray(word, next_names)) {
+        } else if (next_names.inArray(word)) {
             return 'next';   
         }
     }
@@ -103,7 +103,7 @@ jQ(document).ready(function() {
             if (words.length > 2) return true; // continue
             // match on first word
             var word = words[0].toLowerCase();
-            if (!inArray(word, all_words)) return true; // continue
+            if (!all_words.inArray(word)) return true; // continue
 
             // Found!
             var type = getTypeFromWord(word);
