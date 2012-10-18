@@ -14,9 +14,10 @@ jQ(document).ready(function() {
     }
 
     // If link starts with #, append this to current url
-    function sanitiseLink(link) {
+    function sanitiseLink(link) 
+    {
         var cur_url = document.URL;
-        if (typeof link != 'undefined' && link.charAt(0) == '#') {
+        if (typeof link != undefined && link.charAt(0) == '#') {
             // strip existing anchors
             if (cur_url.indexOf('#') != -1) {
                 var stripped = cur_url.substr(0, cur_url.indexOf('#'));
@@ -25,10 +26,12 @@ jQ(document).ready(function() {
                 link = cur_url + link;
             }
         }
+
         return link;
     }
 
-    function getIcon() {
+    function getIcon() 
+    {
         var icon = 'icon-inactive.png';
         if (back_link != '') {
             if (next_link != '') {
@@ -39,10 +42,12 @@ jQ(document).ready(function() {
         } else if (next_link != '') {
             icon = 'icon-next.png';
         }
+
         return icon;
     }
 
-    function setClickIcon(icon, direction) {
+    function setClickIcon(icon, direction) 
+    {
         var click_icon = '';
         if (direction == 'next') {
             if (icon == 'icon-both.png') {
@@ -57,11 +62,13 @@ jQ(document).ready(function() {
                 click_icon = 'icon-back-click.png';    
             }
         }
+
         return click_icon;
     }
 
 
-    function getTypeFromWord(word) {
+    function getTypeFromWord(word) 
+    {
         if (back_names.inArray(word)) {
             return 'back';
         } else if (next_names.inArray(word)) {
@@ -69,18 +76,20 @@ jQ(document).ready(function() {
         }
     }
 
-    function setLink(type, link) {
+    function setLink(type, link) 
+    {
         if (link == '#') return; // A single hash is not a valid link (requires JavaScript)
-        if (typeof link != 'undefined' && type == 'back') {
+        if (typeof link != undefined && type == 'back') {
             if (back_link != '') return;
             back_link = sanitiseLink(link);
-        } else if (typeof link != 'undefined' && type == 'next') {
+        } else if (typeof link != undefined && type == 'next') {
             if (next_link != '') return;
             next_link = sanitiseLink(link);
         }
     }
 
-    function linkTypeExists(type) {
+    function linkTypeExists(type) 
+    {
         if (type == 'back') {
             return back_link != '';    
         } else if (type == 'next') {
@@ -88,12 +97,13 @@ jQ(document).ready(function() {
         }
     }
 
-    function searchForLinks() {
+    function searchForLinks() 
+    {
         // combine back and next words
         var all_words = back_names.concat(next_names); 
 
         // Search last links first
-        jQ(jQ('a').get().reverse()).each(function(){
+        jQ(jQ('a').get().reverse()).each(function() {
             var link_text = jQ(this).text();
             link_text = jQ.trim(link_text.replace(/[^a-z ]/i, ''));
             if (link_text == '') return true; // continue
@@ -110,7 +120,7 @@ jQ(document).ready(function() {
             // Highlight and set found link (if not set already)
             if (!linkTypeExists(type)) {
                 var link = jQ(this).attr('href');
-                if (typeof link != 'undefined') {
+                if (typeof link != undefined) {
                     jQ(this).css({'background-color':'yellow'});
                     setLink(type, link);
                 }
