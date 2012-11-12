@@ -35,13 +35,13 @@ jQ(document).ready(function() {
     function getIcon() 
     {
         var icon = 'icon-inactive.png';
-        if (back_link != '') {
-            if (next_link != '') {
+        if (back_link !== '') {
+            if (next_link !== '') {
                 icon = 'icon-both.png';   
             } else {
                 icon = 'icon-back.png';    
             }
-        } else if (next_link != '') {
+        } else if (next_link !== '') {
             icon = 'icon-next.png';
         }
 
@@ -82,10 +82,10 @@ jQ(document).ready(function() {
     {
         if (link == '#') return; // A single hash is not a valid link (requires JavaScript)
         if (typeof link !== 'undefined' && type == 'back') {
-            if (back_link != '') return;
+            if (back_link !== '') return;
             back_link = sanitiseLink(link);
-        } else if (typeof link !== 'undefined' && type == 'next') {
-            if (next_link != '') return;
+        } else if (typeof link !=== 'undefined' && type == 'next') {
+            if (next_link !== '') return;
             next_link = sanitiseLink(link);
         }
     }
@@ -93,9 +93,9 @@ jQ(document).ready(function() {
     function linkTypeExists(type) 
     {
         if (type == 'back') {
-            return back_link != '';    
+            return back_link !== '';    
         } else if (type == 'next') {
-           return next_link != ''; 
+           return next_link !== ''; 
         }
     }
 
@@ -129,7 +129,7 @@ jQ(document).ready(function() {
             }
 
             // if back AND next links found: exit loop, we're done here
-            if (back_link != '' && next_link != '') { 
+            if (back_link !== '' && next_link !== '') { 
                 return false; // break
             }
         });
@@ -161,13 +161,13 @@ jQ(document).ready(function() {
         if (!document.activeElement instanceof HTMLBodyElement) return;
 
         // left arrow
-        if (back_link != '' && e.keyCode == 37) {
+        if (back_link !== '' && e.keyCode == 37) {
             click_icon = setClickIcon(icon, 'back');
             updateIcon(click_icon);
             document.location = back_link;
         }
         // right arrow
-        if (next_link != '' && e.keyCode == 39) {
+        if (next_link !== '' && e.keyCode == 39) {
             click_icon = setClickIcon(icon, 'next');
             updateIcon(click_icon);
             document.location = next_link;
