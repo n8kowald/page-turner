@@ -3,10 +3,10 @@
 var jQ = jQuery.noConflict();
 jQ(document).ready(function() {
 
-    var back_names = ['back', 'previous', 'prev']; 
-    var next_names = ['next', 'forward']; 
-    var back_link = '';
-    var next_link = '';
+    var back_names = ['back', 'previous', 'prev'], 
+        next_names = ['next', 'forward'],
+        back_link = '',
+        next_link = '';
 
     Array.prototype.inArray = function(needle) {
         for(var i = 0; i < this.length; i++) {
@@ -19,7 +19,7 @@ jQ(document).ready(function() {
     function sanitiseLink(link) 
     {
         var cur_url = document.URL;
-        if (typeof link != undefined && link.charAt(0) == '#') {
+        if (typeof link !== 'undefined' && link.charAt(0) == '#') {
             // strip existing anchors
             if (cur_url.indexOf('#') != -1) {
                 var stripped = cur_url.substr(0, cur_url.indexOf('#'));
@@ -81,10 +81,10 @@ jQ(document).ready(function() {
     function setLink(type, link) 
     {
         if (link == '#') return; // A single hash is not a valid link (requires JavaScript)
-        if (typeof link != undefined && type == 'back') {
+        if (typeof link !== 'undefined' && type == 'back') {
             if (back_link != '') return;
             back_link = sanitiseLink(link);
-        } else if (typeof link != undefined && type == 'next') {
+        } else if (typeof link !== 'undefined' && type == 'next') {
             if (next_link != '') return;
             next_link = sanitiseLink(link);
         }
@@ -122,7 +122,7 @@ jQ(document).ready(function() {
             // Highlight and set found link (if not set already)
             if (!linkTypeExists(type)) {
                 var link = jQ(this).attr('href');
-                if (typeof link != undefined) {
+                if (typeof link !== 'undefined') {
                     jQ(this).css({'background-color':'yellow'});
                     setLink(type, link);
                 }
