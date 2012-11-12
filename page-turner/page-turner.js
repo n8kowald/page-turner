@@ -1,9 +1,11 @@
+(function() {
+
 var jQ = jQuery.noConflict();
 jQ(document).ready(function() {
 
     var back_names = ['back', 'previous', 'prev']; 
     var next_names = ['next', 'forward']; 
-    var back_link = '',
+    var back_link = '';
     var next_link = '';
 
     Array.prototype.inArray = function(needle) {
@@ -174,3 +176,5 @@ jQ(document).ready(function() {
     });
 
 });
+
+})();
