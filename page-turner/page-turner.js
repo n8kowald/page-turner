@@ -84,7 +84,7 @@ jQ(document).ready(function() {
         if (typeof link !== 'undefined' && type == 'back') {
             if (back_link !== '') return;
             back_link = sanitiseLink(link);
-        } else if (typeof link !=== 'undefined' && type == 'next') {
+        } else if (typeof link !== 'undefined' && type == 'next') {
             if (next_link !== '') return;
             next_link = sanitiseLink(link);
         }
