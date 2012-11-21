@@ -8,11 +8,13 @@ jQ(document).ready(function() {
         back_link = '',
         next_link = '';
 
-    Array.prototype.inArray = function(needle) {
-        for(var i = 0; i < this.length; i++) {
-            if (this[i] == needle) return true;
+    if (!Array.prototype.inArray) {
+        Array.prototype.inArray = function(needle) {
+            for(var i = 0; i < this.length; i++) {
+                if (this[i] == needle) return true;
+            }
+            return false;
         }
-        return false;
     }
 
     // If link starts with #, append this to current url
