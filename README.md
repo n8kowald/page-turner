@@ -1,4 +1,4 @@
-## Chrome Extensions
+## Chrome Extension
 
 ### Page Turner
 Detects in page pagination and notifies you via an icon.  
