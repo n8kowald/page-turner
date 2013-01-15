@@ -4,9 +4,9 @@ var jQ = jQuery.noConflict();
 jQ(document).ready(function() {
 
 	var back_names = ['back', 'previous', 'prev'],
-		next_names = ['next', 'forward'],
-		back_link = '',
-		next_link = '';
+	next_names = ['next', 'forward'],
+	back_link = '',
+	next_link = '';
 
 	if (!Array.prototype.inArray) {
 		Array.prototype.inArray = function(needle) {
@@ -24,8 +24,7 @@ jQ(document).ready(function() {
 		if (typeof link !== 'undefined' && link.charAt(0) == '#') {
 			// strip existing anchors
 			if (cur_url.indexOf('#') != -1) {
-				var stripped = cur_url.substr(0, cur_url.indexOf('#'));
-				link = stripped + link;
+				link = cur_url.substr(0, cur_url.indexOf('#')) + link;
 			} else {
 				link = cur_url + link;
 			}
@@ -37,13 +36,12 @@ jQ(document).ready(function() {
 	function getIcon() 
 	{
 		var icon = 'icon-inactive.png';
-		if (back_link !== '') {
-			if (next_link !== '') {
-				icon = 'icon-both.png';
-			} else {
-				icon = 'icon-back.png';
-			}
-		} else if (next_link !== '') {
+
+		if (back_link !== '' && next_link !== '') {
+			icon = 'icon-both.png';
+		} else if (back_link !== '' && next_link == '') {
+			icon = 'icon-back.png';
+		} else if (back_link == '' && next_link !== '') {
 			icon = 'icon-next.png';
 		}
 
@@ -53,18 +51,15 @@ jQ(document).ready(function() {
 	function setClickIcon(icon, direction) 
 	{
 		var click_icon = '';
-		if (direction == 'next') {
-			if (icon == 'icon-both.png') {
-				click_icon = 'icon-both-click-next.png';
-			} else if (icon == 'icon-next.png') {
-				click_icon = 'icon-next-click.png';
-			}
-		} else if (direction == 'back') {
-			if (icon == 'icon-both.png') {
-				click_icon = 'icon-both-click-back.png';
-			} else if (icon == 'icon-back.png') {
-				click_icon = 'icon-back-click.png';
-			}
+
+		if (direction == 'next' && icon == 'icon-both.png') {
+			click_icon = 'icon-both-click-next.png';
+		} else if (direction == 'next' && icon == 'icon-next.png') {
+			click_icon = 'icon-next-click.png';
+		} else if (direction == 'back' && icon == 'icon-both.png') {
+			click_icon = 'icon-both-click-back.png';
+		} else if (direction == 'back' && icon == 'icon-back.png') {
+			click_icon = 'icon-back-click.png';
 		}	
 
 		return click_icon;
