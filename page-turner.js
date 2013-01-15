@@ -138,7 +138,8 @@ jQ(document).ready(function() {
 	}
 
 	// send icon to background.js
-	function updateIcon(icon) {
+	function updateIcon(icon) 
+	{
 		chrome.extension.sendRequest({icon: icon});
 	}
 
