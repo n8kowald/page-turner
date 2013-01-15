@@ -1,5 +1,10 @@
 ## Chrome Extension
 
 ### Page Turner
-Detects in page pagination and notifies you via an icon.  
-Allows you to use the left/right arrow keys on a keyboard to go back/next.
+Navigate paginated webpages using your keyboard's arrow keys. Perfect for search results, image galleries and more.
+
+### Install
+https://chrome.google.com/webstore/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo
+
+### Submit a bug
+https://github.com/n8kowald/page-turner/issues
