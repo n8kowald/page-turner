@@ -65,7 +65,6 @@ jQ(document).ready(function() {
 		return click_icon;
 	}
 
-
 	function getTypeFromWord(word) 
 	{
 		if (back_names.inArray(word)) {
