@@ -119,7 +119,8 @@ jQ(document).ready(function() {
 			if (!linkTypeExists(type)) {
 				var link = jQ(this).attr('href');
 				if (typeof link !== 'undefined') {
-					jQ(this).css({'background-color':'yellow'});
+					//jQ(this).css({'background-color':'yellow'});
+					showArrows(type);
 					setLink(type, link);
 				}
 			}
@@ -130,6 +131,47 @@ jQ(document).ready(function() {
 			}
 		});
 	}
+
+	function showArrows(type)
+	{
+		console.log(type);
+		if (type == 'next') {
+			jQ('<div/>', {
+				id: 'pt_next_page'
+			}).html('>').appendTo('body');	
+			jQ('#pt_next_page').css({
+				display:'none', 
+				position:'fixed',
+				top:'40%',
+				right:'40px',
+				width:'30px', 
+				fontSize:'70px',
+				fontWeight:'bold',
+				zIndex:'111111111',
+				color:'#CCC'
+			}).fadeIn();
+		} else if (type == 'back') {
+			jQ('<div/>', {
+				id: 'pt_back_page'
+			}).html('<').appendTo('body');	
+			jQ('#pt_back_page').css({
+				display:'none', 
+				position:'fixed',
+				top:'40%',
+				left:'30px',
+				width:'30px', 
+				fontSize:'70px',
+				fontWeight:'bold',
+				zIndex:'22222222',
+				color:'#CCC'
+			}).fadeIn();
+		}
+	}
+
+	jQ(window).resize(function(){ 
+		jQ('#pt_back_page').css({'margin-top':-this.height() / 2 + 'px'})
+		jQ('#pt_next_page').css({'margin-top':-this.height() / 2 + 'px'})
+	})
 
 	// send icon to background.js
 	function updateIcon(icon) 
