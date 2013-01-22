@@ -142,7 +142,7 @@ jQ(document).ready(function() {
 			jQ('#pt_next_page').css({
 				display:'none', 
 				position:'fixed',
-				top:'40%',
+				top:'50%',
 				right:'40px',
 				width:'30px', 
 				fontSize:'70px',
@@ -157,7 +157,7 @@ jQ(document).ready(function() {
 			jQ('#pt_back_page').css({
 				display:'none', 
 				position:'fixed',
-				top:'40%',
+				top:'50%',
 				left:'30px',
 				width:'30px', 
 				fontSize:'70px',
