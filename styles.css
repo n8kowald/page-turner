@@ -1,5 +1,5 @@
 .pt_indicator {
-	display:block;
+	display:none;
 	font-family:helvetica;
 	position:fixed;
 	top:50%;
@@ -20,5 +20,5 @@
 	z-index:3141592;
 }
 .clicked {
-	color:#419A38;
+	color:#747474;
 }

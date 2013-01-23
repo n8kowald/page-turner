@@ -1,0 +1,31 @@
+/* Reset margin and paddings */
+body {
+	background-color:#f1f1f1;
+}
+body, h1, h2, p, hr {
+	margin:0;
+	padding:0;
+}
+a {
+	color:#306b8a;
+}
+
+h1 {
+	font-size:22px;
+	padding-bottom:7px;
+	border-bottom:1px solid #CCC;
+}
+h2 {
+	font-size:16px;
+	margin-top:20px;
+	margin-bottom:5px;
+}
+#holder {
+	font-family:Arial, helvetica, sans-serif;
+	font-size:14px;
+	width:270px;
+	padding:10px;
+}
+#holder label {
+	cursor:pointer;
+}

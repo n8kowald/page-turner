@@ -7,6 +7,10 @@ $(document).ready(function() {
 	back_link = '',
 	next_link = '';
 
+	// Create arrows
+	$('<div/>', { id: 'pt_next_page', class: 'pt_indicator' }).html('>').appendTo('body');	
+	$('<div/>', { id: 'pt_back_page', class: 'pt_indicator' }).html('<').appendTo('body');	
+
 	if (!Array.prototype.inArray) {
 		Array.prototype.inArray = function(needle) {
 			for(var i = 0; i < this.length; i++) {
@@ -133,13 +137,15 @@ $(document).ready(function() {
 
 	function showArrows(type, href)
 	{
-		if (type == 'next') {
-			$('<div/>', { id: 'pt_next_page', class: 'pt_indicator' }).html('>').appendTo('body');	
-			$('#pt_next_page').fadeIn();
-		} else if (type == 'back') {
-			$('<div/>', { id: 'pt_back_page', class: 'pt_indicator' }).html('<').appendTo('body');	
-			$('#pt_back_page').fadeIn();
-		}
+		chrome.storage.local.get('arrows', function(items) {
+			if (items.arrows == 1) {
+				if (type == 'next') {
+					$('#pt_next_page').fadeIn();
+				} else if (type == 'back') {
+					$('#pt_back_page').fadeIn();
+				}
+			}
+		});
 	}
 
 	$(window).resize(function(){ 
