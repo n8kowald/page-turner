@@ -1,7 +1,6 @@
-(function() {
+(function($) {
 
-var jQ = jQuery.noConflict();
-jQ(document).ready(function() {
+$(document).ready(function() {
 
 	var back_names = ['back', 'previous', 'prev'],
 	next_names = ['next', 'forward'],
@@ -101,9 +100,9 @@ jQ(document).ready(function() {
 		var all_words = back_names.concat(next_names);
 
 		// Search last links first
-		jQ(jQ('a').get().reverse()).each(function() {
-			var link_text = jQ(this).text();
-			link_text = jQ.trim(link_text.replace(/[^a-z ]/i, ''));
+		$($('a').get().reverse()).each(function() {
+			var link_text = $(this).text();
+			link_text = $.trim(link_text.replace(/[^a-z ]/i, ''));
 			if (link_text == '') return true; // continue
 			var words = link_text.split(' ');
 			// Links with more than two words are probably not pagination
@@ -117,10 +116,10 @@ jQ(document).ready(function() {
 			var type = getTypeFromWord(word);
 			// Highlight and set found link (if not set already)
 			if (!linkTypeExists(type)) {
-				var link = jQ(this).attr('href');
+				var link = $(this).attr('href');
 				if (typeof link !== 'undefined') {
-					//jQ(this).css({'background-color':'yellow'});
-					showArrows(type);
+					//$(this).css({'background-color':'yellow'});
+					showArrows(type, link);
 					setLink(type, link);
 				}
 			}
@@ -132,45 +131,46 @@ jQ(document).ready(function() {
 		});
 	}
 
-	function showArrows(type)
+	function showArrows(type, href)
 	{
-		console.log(type);
 		if (type == 'next') {
-			jQ('<div/>', {
-				id: 'pt_next_page'
-			}).html('>').appendTo('body');	
-			jQ('#pt_next_page').css({
-				display:'none', 
-				position:'fixed',
-				top:'50%',
-				right:'40px',
-				width:'30px', 
-				fontSize:'70px',
-				fontWeight:'bold',
-				zIndex:'111111111',
-				color:'#CCC'
+			$('<div/>', { id: 'pt_next_page' }).html('>').appendTo('body');	
+			$('#pt_next_page').css({
+				'display':'none', 
+				'right':'35px',
+				'z-index':'314159',
+
+				'font-family':'helvetica',
+				'position':'fixed',
+				'top':'50%',
+				'width':'30px', 
+				'font-size':'70px',
+				'font-weight':'bold',
+				'color':'#CCC',
+				'opacity':'0.7'
 			}).fadeIn();
 		} else if (type == 'back') {
-			jQ('<div/>', {
-				id: 'pt_back_page'
-			}).html('<').appendTo('body');	
-			jQ('#pt_back_page').css({
-				display:'none', 
-				position:'fixed',
-				top:'50%',
-				left:'30px',
-				width:'30px', 
-				fontSize:'70px',
-				fontWeight:'bold',
-				zIndex:'22222222',
-				color:'#CCC'
+			$('<div/>', { id: 'pt_back_page' }).html('<').appendTo('body');	
+			$('#pt_back_page').css({
+				'display':'none', 
+				'left':'25px',
+				'z-index':'3141592',
+
+				'font-family':'helvetica',
+				'position':'fixed',
+				'top':'50%',
+				'width':'30px', 
+				'font-size':'70px',
+				'font-weight':'bold',
+				'color':'#CCC',
+				'opacity':'0.7'
 			}).fadeIn();
 		}
 	}
 
-	jQ(window).resize(function(){ 
-		jQ('#pt_back_page').css({'margin-top':-this.height() / 2 + 'px'})
-		jQ('#pt_next_page').css({'margin-top':-this.height() / 2 + 'px'})
+	$(window).resize(function(){ 
+		$('#pt_back_page').css({'top':'50%'});
+		$('#pt_next_page').css({'top':'50%'});
 	})
 
 	// send icon to background.js
@@ -194,7 +194,7 @@ jQ(document).ready(function() {
 	var click_icon = '';
 
 	// set keyboard shortcuts for back/next links
-	jQ(document).keydown(function(e) {
+	$(document).keydown(function(e) {
 
 		// Detect context. Don't want left/right keys to work if we're inside a form input
 		var element = document.activeElement;
@@ -202,12 +202,14 @@ jQ(document).ready(function() {
 
 		// left arrow
 		if (back_link !== '' && e.keyCode == 37) {
+			$('#pt_back_page').css({'color':'#B7B7B7'});
 			click_icon = setClickIcon(icon, 'back');
 			updateIcon(click_icon);
 			document.location = back_link;
 		}
 		// right arrow
 		if (next_link !== '' && e.keyCode == 39) {
+			$('#pt_next_page').css({'color':'#B7B7B7'});
 			click_icon = setClickIcon(icon, 'next');
 			updateIcon(click_icon);
 			document.location = next_link;
@@ -217,4 +219,4 @@ jQ(document).ready(function() {
 
 });
 
-})();
+})(jQuery);
