@@ -134,37 +134,11 @@ $(document).ready(function() {
 	function showArrows(type, href)
 	{
 		if (type == 'next') {
-			$('<div/>', { id: 'pt_next_page' }).html('>').appendTo('body');	
-			$('#pt_next_page').css({
-				'display':'none', 
-				'right':'35px',
-				'z-index':'314159',
-
-				'font-family':'helvetica',
-				'position':'fixed',
-				'top':'50%',
-				'width':'30px', 
-				'font-size':'70px',
-				'font-weight':'bold',
-				'color':'#CCC',
-				'opacity':'0.7'
-			}).fadeIn();
+			$('<div/>', { id: 'pt_next_page', class: 'pt_indicator' }).html('>').appendTo('body');	
+			$('#pt_next_page').fadeIn();
 		} else if (type == 'back') {
-			$('<div/>', { id: 'pt_back_page' }).html('<').appendTo('body');	
-			$('#pt_back_page').css({
-				'display':'none', 
-				'left':'25px',
-				'z-index':'3141592',
-
-				'font-family':'helvetica',
-				'position':'fixed',
-				'top':'50%',
-				'width':'30px', 
-				'font-size':'70px',
-				'font-weight':'bold',
-				'color':'#CCC',
-				'opacity':'0.7'
-			}).fadeIn();
+			$('<div/>', { id: 'pt_back_page', class: 'pt_indicator' }).html('<').appendTo('body');	
+			$('#pt_back_page').fadeIn();
 		}
 	}
 
@@ -202,14 +176,14 @@ $(document).ready(function() {
 
 		// left arrow
 		if (back_link !== '' && e.keyCode == 37) {
-			$('#pt_back_page').css({'color':'#B7B7B7'});
+			$('#pt_back_page').addClass('clicked');
 			click_icon = setClickIcon(icon, 'back');
 			updateIcon(click_icon);
 			document.location = back_link;
 		}
 		// right arrow
 		if (next_link !== '' && e.keyCode == 39) {
-			$('#pt_next_page').css({'color':'#B7B7B7'});
+			$('#pt_next_page').addClass('clicked');
 			click_icon = setClickIcon(icon, 'next');
 			updateIcon(click_icon);
 			document.location = next_link;
