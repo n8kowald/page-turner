@@ -138,14 +138,15 @@ $(document).ready(function() {
 	function showArrows(type, href)
 	{
 		chrome.storage.local.get('arrows', function(items) {
-			if (items.arrows == 1) {
-				if (type == 'next') {
-					$('#pt_next_page').fadeIn();
-				} else if (type == 'back') {
-					$('#pt_back_page').fadeIn();
-				}
+			if (type == 'next') {
+				$('#pt_next_page').addClass('visible');
+				if (items.arrows == 1) $('#pt_next_page').fadeIn();
+			} else if (type == 'back') {
+				$('#pt_back_page').addClass('visible');
+				if (items.arrows == 1) $('#pt_back_page').fadeIn();
 			}
 		});
+
 	}
 
 	$(window).resize(function(){ 

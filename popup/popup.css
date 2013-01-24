@@ -12,19 +12,24 @@ a {
 
 h1 {
 	font-size:22px;
-	padding-bottom:7px;
+	padding-bottom:4px;
 	border-bottom:1px solid #CCC;
+	margin-bottom:-4px;
 }
 h2 {
 	font-size:16px;
-	margin-top:20px;
+	margin-top:16px;
 	margin-bottom:5px;
+}
+h2 span {
+	color:#515151;
+	font-size:20px;
 }
 #holder {
 	font-family:Arial, helvetica, sans-serif;
 	font-size:14px;
 	width:270px;
-	padding:10px;
+	padding:11px;
 }
 #holder label {
 	cursor:pointer;

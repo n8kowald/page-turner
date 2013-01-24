@@ -10,7 +10,3 @@ chrome.tabs.onActivated.addListener(function(tab) {
 		chrome.browserAction.setIcon({path: 'icons/icon-inactive.png'});
 	}
 });
-function hideArrows() {
-	document.getElementById('pt_next_page').display='none';
-	document.getElementById('pt_back_page').display='none';
-}

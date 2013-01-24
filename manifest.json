@@ -5,7 +5,7 @@
 	"description": "Navigate paginated webpages using your keyboard's arrow keys. Perfect for search results, image galleries and more.",
 	"browser_action": { 
 		"default_icon": "icons/icon-inactive.png",
-		"default_popup": "popup.html"
+		"default_popup": "popup/popup.html"
 	},
 	"permissions": ["tabs", "storage", "http://*/*", "https://*/*"],
 	"icons": {
