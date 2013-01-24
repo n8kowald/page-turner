@@ -7,6 +7,13 @@ $(document).ready(function() {
 	back_link = '',
 	next_link = '';
 
+	// If show arrows preference not set: default to show
+	chrome.storage.local.get('arrows', function(items) {
+		if (items.arrows == undefined) {
+			chrome.storage.local.set({'arrows':1}, function(){});
+		}
+	});
+
 	// Create arrows
 	$('<div/>', { id: 'pt_next_page', class: 'pt_indicator' }).html('>').appendTo('body');	
 	$('<div/>', { id: 'pt_back_page', class: 'pt_indicator' }).html('<').appendTo('body');	
