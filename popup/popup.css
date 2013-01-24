@@ -7,14 +7,20 @@ body, h1, h2, p, hr {
 	padding:0;
 }
 a {
-	color:#306b8a;
+	color:#2f582f;
+	text-decoration:none;
+}
+a:hover {
+	color:#339933;
 }
 
 h1 {
 	font-size:22px;
+	padding-left:32px;
 	padding-bottom:4px;
 	border-bottom:1px solid #CCC;
 	margin-bottom:-4px;
+	background:url(../icons/icon21.png) no-repeat 0 2px;
 }
 h2 {
 	font-size:16px;
