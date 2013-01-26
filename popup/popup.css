@@ -40,3 +40,7 @@ h2 span {
 #holder label {
 	cursor:pointer;
 }
+#holder #meta {
+	margin-top:20px;
+	color:#121212;
+}
