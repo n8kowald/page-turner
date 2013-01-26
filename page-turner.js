@@ -5,11 +5,13 @@ $(document).ready(function() {
 	var back_names = ['back', 'previous', 'prev'],
 	next_names = ['next', 'forward'],
 	back_link = '',
-	next_link = '';
+	next_link = '',
+	first_run = 0;
 
 	// If show arrows preference not set: default to show
 	chrome.storage.local.get('arrows', function(items) {
 		if (items.arrows == undefined) {
+			first_run = 1;
 			chrome.storage.local.set({'arrows':1}, function(){});
 		}
 	});
@@ -137,9 +139,8 @@ $(document).ready(function() {
 			if (back_link !== '' && next_link !== '') {
 				return false; // break
 			}
-			// back OR next link exists: show arrows (if preference is to show)
-			showArrows();
 		});
+
 	}
 
 	function showArrows()
@@ -147,11 +148,11 @@ $(document).ready(function() {
 		chrome.storage.local.get('arrows', function(items) {
 			if (next_link !== '') {
 				$('#pt_next_page').addClass('visible');
-				if (items.arrows == 1) $('#pt_next_page').fadeIn();
+				if (items.arrows == 1 || first_run == 1) $('#pt_next_page').fadeIn();
 			}
 			if (back_link !== '') {
 				$('#pt_back_page').addClass('visible');
-				if (items.arrows == 1) $('#pt_back_page').fadeIn();
+				if (items.arrows == 1 || first_run == 1) $('#pt_back_page').fadeIn();
 			}
 		});
 
@@ -176,6 +177,9 @@ $(document).ready(function() {
 
 	// update extension icon
 	updateIcon(icon);
+
+	// Show arrows (if preference is to show)
+	showArrows();
 
 	//console.log('Back: ' + back_link);
 	//console.log('Next: ' + next_link);
