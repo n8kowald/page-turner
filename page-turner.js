@@ -27,22 +27,6 @@ $(document).ready(function() {
 		}
 	}
 
-	// If link starts with #, append this to current url
-	function sanitiseLink(link) 
-	{
-		var cur_url = document.URL;
-		if (typeof link !== 'undefined' && link.charAt(0) == '#') {
-			// strip existing anchors
-			if (cur_url.indexOf('#') != -1) {
-				link = cur_url.substr(0, cur_url.indexOf('#')) + link;
-			} else {
-				link = cur_url + link;
-			}
-		}
-
-		return link;
-	}
-
 	function getIcon() 
 	{
 		var icon = 'icon-inactive.png';
@@ -82,6 +66,22 @@ $(document).ready(function() {
 		} else if (next_names.inArray(word)) {
 			return 'next';
 		}
+	}
+
+	// If link starts with #, append this to current url
+	function sanitiseLink(link) 
+	{
+		var cur_url = document.URL;
+		if (typeof link !== 'undefined' && link.charAt(0) == '#') {
+			// strip existing anchors
+			if (cur_url.indexOf('#') != -1) {
+				link = cur_url.substr(0, cur_url.indexOf('#')) + link;
+			} else {
+				link = cur_url + link;
+			}
+		}
+
+		return link;
 	}
 
 	function setLink(type, link) 
@@ -125,12 +125,10 @@ $(document).ready(function() {
 
 			// Found!
 			var type = getTypeFromWord(word);
-			// Highlight and set found link (if not set already)
+			// Set found links (if not set already)
 			if (!linkTypeExists(type)) {
 				var link = $(this).attr('href');
 				if (typeof link !== 'undefined') {
-					//$(this).css({'background-color':'yellow'});
-					showArrows(type, link);
 					setLink(type, link);
 				}
 			}
@@ -139,16 +137,19 @@ $(document).ready(function() {
 			if (back_link !== '' && next_link !== '') {
 				return false; // break
 			}
+			// back OR next link exists: show arrows (if preference is to show)
+			showArrows();
 		});
 	}
 
-	function showArrows(type, href)
+	function showArrows()
 	{
 		chrome.storage.local.get('arrows', function(items) {
-			if (type == 'next') {
+			if (next_link !== '') {
 				$('#pt_next_page').addClass('visible');
 				if (items.arrows == 1) $('#pt_next_page').fadeIn();
-			} else if (type == 'back') {
+			}
+			if (back_link !== '') {
 				$('#pt_back_page').addClass('visible');
 				if (items.arrows == 1) $('#pt_back_page').fadeIn();
 			}
