@@ -1,25 +1,6 @@
 {
-<<<<<<< HEAD
-  "name": "Page Turner", 
-  "version": "1.0",
-  "manifest_version": 2,
-  "description": "Makes it easy to browse through paginated webpages using your keyboard arrow keys. Perfect for search results, image galleries and more.",
-  "browser_action": { "default_icon": "icons/icon-inactive.png" },
-  "permissions": ["tabs", "http://*/*", "https://*/*"],
-  "icons": {
-    "16": "icons/icon-inactive.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png" 
-  },
-  "background": { "scripts": ["background.js"] },
-  "content_scripts": [{
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["jquery.js", "page-turner.js"],
-	  "all_frames":true
-  }]
-=======
 	"name": "Page Turner", 
-	"version": "1.9",
+	"version": "2.0",
 	"manifest_version": 2,
 	"description": "Navigate paginated webpages using your keyboard's arrow keys. Perfect for search results, image galleries and more.",
 	"browser_action": { 
@@ -40,5 +21,4 @@
 		"js": ["jquery.js", "page-turner.js"],
 		"css": ["styles.css"]
 	}]
->>>>>>> fb89d33e33dbbefa3c98faaec723a9bdaeb5b3b1
 }
