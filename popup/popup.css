@@ -1,0 +1,46 @@
+/* Reset margin and paddings */
+body {
+	background-color:#f1f1f1;
+}
+body, h1, h2, p, hr {
+	margin:0;
+	padding:0;
+}
+a {
+	color:#2f582f;
+	text-decoration:none;
+}
+a:hover {
+	color:#339933;
+}
+
+h1 {
+	font-size:22px;
+	padding-left:32px;
+	padding-bottom:4px;
+	border-bottom:1px solid #CCC;
+	margin-bottom:-4px;
+	background:url(../icons/icon21.png) no-repeat 0 2px;
+}
+h2 {
+	font-size:16px;
+	margin-top:16px;
+	margin-bottom:5px;
+}
+h2 span {
+	color:#515151;
+	font-size:20px;
+}
+#holder {
+	font-family:Arial, helvetica, sans-serif;
+	font-size:14px;
+	width:270px;
+	padding:11px;
+}
+#holder label {
+	cursor:pointer;
+}
+#holder #meta {
+	margin-top:20px;
+	color:#121212;
+}
