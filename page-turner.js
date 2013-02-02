@@ -137,10 +137,21 @@ $(document).ready(function() {
 
 			// if back AND next links found: exit loop, we're done here
 			if (back_link !== '' && next_link !== '') {
+				// Add the prerender link to the page.
+				// This speeds up page-turning by preloading the next page.
+				if (next_link !== '') addPrerenderLink(next_link);
 				return false; // break
 			}
 		});
 
+	}
+
+	function addPrerenderLink(next_link)
+	{
+		$("<link />", {
+			rel: "prerender",
+			href: next_link
+		}).appendTo('head');
 	}
 
 	function showArrows()
