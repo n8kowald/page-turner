@@ -2,7 +2,7 @@
 
 ### Page Turner
 Detects in page pagination and notifies you via an icon.  
-Allows you to use the left/right arrow keys on a keyboard to go back/next.
+Allows you to use the left/right arrow keys on a keyboard to go back/next.  
 Now prerenders next links for super fast page loads! See more: https://developers.google.com/chrome/whitepapers/prerender
 
 Created from my wish that any website with a back or next link could be controlled from my keyboard's arrow keys.
