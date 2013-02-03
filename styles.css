@@ -1,24 +1,25 @@
 .pt_indicator {
 	display:none;
-	font-family:helvetica;
 	position:fixed;
 	top:50%;
 	width:30px;
-	font-size:70px;
-	font-weight:bold;
-	color:#CCC;
-	opacity:0.7;
+	height:62px;
 }
 #pt_next_page {
 	display:none;
 	right:35px;
 	z-index:314159;
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/next.png) no-repeat 0 0;
 }
 #pt_back_page {
 	display:none;
 	left:25px;
 	z-index:3141592;
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/back.png) no-repeat 0 0;
 }
-.clicked {
-	color:#7e7e7e;
+#pt_next_page.clicked {
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/next.png) no-repeat 0 -62px;
+}
+#pt_back_page.clicked {
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/back.png) no-repeat 0 -62px;
 }

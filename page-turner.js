@@ -17,8 +17,8 @@ $(document).ready(function() {
 	});
 
 	// Create arrows
-	$('<div/>', { id: 'pt_next_page', class: 'pt_indicator' }).html('>').appendTo('body');	
-	$('<div/>', { id: 'pt_back_page', class: 'pt_indicator' }).html('<').appendTo('body');	
+	$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
+	$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
 
 	if (!Array.prototype.inArray) {
 		Array.prototype.inArray = function(needle) {
@@ -148,9 +148,9 @@ $(document).ready(function() {
 
 	function addPrerenderLink(next_link)
 	{
-		$("<link />", {
-			rel: "prerender",
-			href: next_link
+		$('<link />', {
+			'rel': 'prerender',
+			'href': next_link
 		}).appendTo('head');
 	}
 
