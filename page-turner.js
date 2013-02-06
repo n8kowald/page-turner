@@ -1,7 +1,5 @@
 (function($) {
 
-$(document).ready(function() {
-
 	var back_names = ['back', 'previous', 'prev'],
 	next_names = ['next', 'forward'],
 	back_link = '',
@@ -15,14 +13,6 @@ $(document).ready(function() {
 			chrome.storage.local.set({'arrows':1}, function(){});
 		}
 	});
-
-	// Create arrows
-	$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
-	$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
-
-	// Reduce DOM queries
-	var next_page_arrow = $('#pt_next_page');
-	var back_page_arrow = $('#pt_back_page');
 
 	if (!Array.prototype.inArray) {
 		Array.prototype.inArray = function(needle) {
@@ -110,115 +100,125 @@ $(document).ready(function() {
 		}
 	}
 
-	function searchForLinks() 
-	{
-		// combine back and next words
-		var all_words = back_names.concat(next_names);
-
-		// Search last links first
-		$($('a').get().reverse()).each(function() {
-			var link_text = $(this).text().replace(/[^a-z ]/gi, ' ').trim();
-			if (link_text == '') return true; // continue
-			var words = link_text.split(' ');
-			// Links with more than two words are probably not pagination
-			// could even change to one word: requires moar testing
-			if (words.length > 2) return true; // continue
-			// match on first word
-			var word = words[0].toLowerCase();
-			if (!all_words.inArray(word)) return true; // continue
-
-			// Found!
-			var type = getTypeFromWord(word);
-			// Set found links (if not set already)
-			if (!linkOfTypeExists(type) && typeof this.href !== 'undefined') {
-				setLink(type, this.href);
-			}
-
-			// if back AND next links found: exit loop, we're done here
-			if (back_link !== '' && next_link !== '') {
-				// Add the prerender link to the page.
-				// This speeds up page-turning by preloading the next page.
-				if (next_link !== '') addPrerenderLink(next_link);
-				return false; // break
-			}
-		});
-	}
-
-	function addPrerenderLink(next_link)
-	{
-		$('<link />', {
-			'rel': 'prerender',
-			'href': next_link
-		}).appendTo('head');
-	}
-
-	function showArrows()
-	{
-		chrome.storage.local.get('arrows', function(items) {
-			if (next_link !== '') {
-				next_page_arrow.addClass('visible');
-				if (items.arrows == 1 || first_run == 1) next_page_arrow.fadeIn();
-			}
-			if (back_link !== '') {
-				back_page_arrow.addClass('visible');
-				if (items.arrows == 1 || first_run == 1) back_page_arrow.fadeIn();
-			}
-		});
-
-	}
-
-	$(window).resize(function(){ 
-		back_page_arrow.css({'top':'50%'});
-		next_page_arrow.css({'top':'50%'});
-	})
-
 	// send icon to background.js
 	function updateIcon(icon) 
 	{
 		chrome.extension.sendRequest({icon: icon});
 	}
 
-	// find links
-	searchForLinks();
+	$(document).ready(function() {
 
-	// determine icon
-	icon = getIcon();
+		// Create arrows
+		$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
+		$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
 
-	// update extension icon
-	updateIcon(icon);
+		// Reduce DOM queries
+		var next_page_arrow = $('#pt_next_page');
+		var back_page_arrow = $('#pt_back_page');
 
-	// Show arrows (if preference is to show)
-	showArrows();
+		function searchForLinks() 
+		{
+			// combine back and next words
+			var all_words = back_names.concat(next_names);
 
-	//console.log('Back: ' + back_link);
-	//console.log('Next: ' + next_link);
+			// Search last links first
+			$($('a').get().reverse()).each(function() {
+				var link_text = $(this).text().replace(/[^a-z ]/gi, ' ').trim();
+				if (link_text == '') return true; // continue
+				var words = link_text.split(' ');
+				// Links with more than two words are probably not pagination
+				// could even change to one word: requires moar testing
+				if (words.length > 2) return true; // continue
+				// match on first word
+				var word = words[0].toLowerCase();
+				if (!all_words.inArray(word)) return true; // continue
 
-	// Remove arrow divs if not used
-	if (back_link === '') back_page_arrow.remove();
-	if (next_link === '') next_page_arrow.remove();
+				// Found!
+				var type = getTypeFromWord(word);
+				// Set found links (if not set already)
+				if (!linkOfTypeExists(type) && typeof this.href !== 'undefined') {
+					setLink(type, this.href);
+				}
 
-	// set keyboard shortcuts for back/next links
-	$(document).on('keydown', function(e) {
-
-		// Detect context. Don't want left/right keys to work if we're inside a form input
-		var element = document.activeElement;
-		if (!element instanceof HTMLBodyElement || element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true')) return;
-
-		// left arrow
-		if (back_link !== '' && e.keyCode == 37) {
-			back_page_arrow.addClass('clicked');
-			updateIcon(getClickIcon(icon, 'back'));
-			document.location = back_link;
+				// if back AND next links found: exit loop, we're done here
+				if (back_link !== '' && next_link !== '') {
+					return false; // break
+				}
+			});
 		}
-		// right arrow
-		if (next_link !== '' && e.keyCode == 39) {
-			next_page_arrow.addClass('clicked');
-			updateIcon(getClickIcon(icon, 'next'));
-			document.location = next_link;
+
+		function addPrerenderLink(next_link)
+		{
+			$('<link />', {
+				'rel': 'prerender',
+				'href': next_link
+			}).appendTo('head');
 		}
+
+		function showArrows()
+		{
+			chrome.storage.local.get('arrows', function(items) {
+				if (next_link !== '') {
+					next_page_arrow.addClass('visible');
+					if (items.arrows == 1 || first_run == 1) next_page_arrow.fadeIn();
+				}
+				if (back_link !== '') {
+					back_page_arrow.addClass('visible');
+					if (items.arrows == 1 || first_run == 1) back_page_arrow.fadeIn();
+				}
+			});
+
+		}
+
+		$(window).resize(function(){ 
+			back_page_arrow.css({'top':'50%'});
+			next_page_arrow.css({'top':'50%'});
+		})
+
+		// find links
+		searchForLinks();
+
+		// determine icon
+		icon = getIcon();
+
+		// update extension icon
+		updateIcon(icon);
+
+		// Show arrows (if preference is to show)
+		showArrows();
+
+		// Remove arrow divs if not used
+		if (back_link === '') back_page_arrow.remove();
+		if (next_link === '') next_page_arrow.remove();
+
+		// Prerendering speeds up page-turning by preloading the next page
+		if (next_link !== '') addPrerenderLink(next_link);
+
+		//console.log('Back: ' + back_link);
+		//console.log('Next: ' + next_link);
+
+		// set keyboard shortcuts for back/next links
+		$(document).on('keydown', function(e) {
+
+			// Detect context. Don't want left/right keys to work if we're inside a form input
+			var element = document.activeElement;
+			if (!element instanceof HTMLBodyElement || element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true')) return;
+
+			// left arrow
+			if (back_link !== '' && e.keyCode == 37) {
+				back_page_arrow.addClass('clicked');
+				updateIcon(getClickIcon(icon, 'back'));
+				document.location = back_link;
+			}
+			// right arrow
+			if (next_link !== '' && e.keyCode == 39) {
+				next_page_arrow.addClass('clicked');
+				updateIcon(getClickIcon(icon, 'next'));
+				document.location = next_link;
+			}
+
+		});
 
 	});
-
-});
 
 })(jQuery);
