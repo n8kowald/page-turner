@@ -20,6 +20,10 @@ $(document).ready(function() {
 	$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
 	$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
 
+	// Reduce DOM queries
+	var next_page_arrow = $('#pt_next_page');
+	var back_page_arrow = $('#pt_back_page');
+
 	if (!Array.prototype.inArray) {
 		Array.prototype.inArray = function(needle) {
 			for(var i = 0; i < this.length; i++) {
@@ -44,7 +48,7 @@ $(document).ready(function() {
 		return icon;
 	}
 
-	function setClickIcon(icon, direction) 
+	function getClickIcon(icon, direction) 
 	{
 		var click_icon = '';
 
@@ -73,13 +77,12 @@ $(document).ready(function() {
 	// If link starts with #, append this to current url
 	function sanitiseLink(link) 
 	{
-		var cur_url = document.URL;
 		if (typeof link !== 'undefined' && link.charAt(0) == '#') {
 			// strip existing anchors
-			if (cur_url.indexOf('#') != -1) {
-				link = cur_url.substr(0, cur_url.indexOf('#')) + link;
+			if (document.URL.indexOf('#') != -1) {
+				link = document.URL.substr(0, document.URL.indexOf('#')) + link;
 			} else {
-				link = cur_url + link;
+				link = document.URL + link;
 			}
 		}
 
@@ -98,7 +101,7 @@ $(document).ready(function() {
 		}
 	}
 
-	function linkTypeExists(type) 
+	function linkOfTypeExists(type) 
 	{
 		if (type == 'back') {
 			return back_link !== '';
@@ -114,8 +117,7 @@ $(document).ready(function() {
 
 		// Search last links first
 		$($('a').get().reverse()).each(function() {
-			var link_text = $(this).text();
-			link_text = $.trim(link_text.replace(/[^a-z ]/i, ''));
+			var link_text = $(this).text().replace(/[^a-z ]/gi, ' ').trim();
 			if (link_text == '') return true; // continue
 			var words = link_text.split(' ');
 			// Links with more than two words are probably not pagination
@@ -128,11 +130,8 @@ $(document).ready(function() {
 			// Found!
 			var type = getTypeFromWord(word);
 			// Set found links (if not set already)
-			if (!linkTypeExists(type)) {
-				var link = $(this).attr('href');
-				if (typeof link !== 'undefined') {
-					setLink(type, link);
-				}
+			if (!linkOfTypeExists(type) && typeof this.href !== 'undefined') {
+				setLink(type, this.href);
 			}
 
 			// if back AND next links found: exit loop, we're done here
@@ -143,7 +142,6 @@ $(document).ready(function() {
 				return false; // break
 			}
 		});
-
 	}
 
 	function addPrerenderLink(next_link)
@@ -158,20 +156,20 @@ $(document).ready(function() {
 	{
 		chrome.storage.local.get('arrows', function(items) {
 			if (next_link !== '') {
-				$('#pt_next_page').addClass('visible');
-				if (items.arrows == 1 || first_run == 1) $('#pt_next_page').fadeIn();
+				next_page_arrow.addClass('visible');
+				if (items.arrows == 1 || first_run == 1) next_page_arrow.fadeIn();
 			}
 			if (back_link !== '') {
-				$('#pt_back_page').addClass('visible');
-				if (items.arrows == 1 || first_run == 1) $('#pt_back_page').fadeIn();
+				back_page_arrow.addClass('visible');
+				if (items.arrows == 1 || first_run == 1) back_page_arrow.fadeIn();
 			}
 		});
 
 	}
 
 	$(window).resize(function(){ 
-		$('#pt_back_page').css({'top':'50%'});
-		$('#pt_next_page').css({'top':'50%'});
+		back_page_arrow.css({'top':'50%'});
+		next_page_arrow.css({'top':'50%'});
 	})
 
 	// send icon to background.js
@@ -195,10 +193,12 @@ $(document).ready(function() {
 	//console.log('Back: ' + back_link);
 	//console.log('Next: ' + next_link);
 
-	var click_icon = '';
+	// Remove arrow divs if not used
+	if (back_link === '') back_page_arrow.remove();
+	if (next_link === '') next_page_arrow.remove();
 
 	// set keyboard shortcuts for back/next links
-	$(document).keydown(function(e) {
+	$(document).on('keydown', function(e) {
 
 		// Detect context. Don't want left/right keys to work if we're inside a form input
 		var element = document.activeElement;
@@ -206,16 +206,14 @@ $(document).ready(function() {
 
 		// left arrow
 		if (back_link !== '' && e.keyCode == 37) {
-			$('#pt_back_page').addClass('clicked');
-			click_icon = setClickIcon(icon, 'back');
-			updateIcon(click_icon);
+			back_page_arrow.addClass('clicked');
+			updateIcon(getClickIcon(icon, 'back'));
 			document.location = back_link;
 		}
 		// right arrow
 		if (next_link !== '' && e.keyCode == 39) {
-			$('#pt_next_page').addClass('clicked');
-			click_icon = setClickIcon(icon, 'next');
-			updateIcon(click_icon);
+			next_page_arrow.addClass('clicked');
+			updateIcon(getClickIcon(icon, 'next'));
 			document.location = next_link;
 		}
 
