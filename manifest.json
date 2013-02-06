@@ -22,7 +22,7 @@
 	},
 	"content_scripts": [{
 		"matches": ["http://*/*", "https://*/*"],
-		"js": ["jquery.js", "page-turner.js"],
+		"js": ["jquery-1.9.0.min.js", "page-turner.js"],
 		"css": ["styles.css"]
 	}]
 }
