@@ -9,17 +9,17 @@
 	display:none;
 	right:35px;
 	z-index:314159;
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/next.png) no-repeat 0 0;
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-next.png) no-repeat 0 0;
 }
 #pt_back_page {
 	display:none;
 	left:25px;
 	z-index:3141592;
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/back.png) no-repeat 0 0;
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-back.png) no-repeat 0 0;
 }
 #pt_next_page.clicked {
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/next.png) no-repeat 0 -62px;
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-next.png) no-repeat 0 -62px;
 }
 #pt_back_page.clicked {
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/back.png) no-repeat 0 -62px;
+	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-back.png) no-repeat 0 -62px;
 }

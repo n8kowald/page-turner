@@ -1,19 +1,19 @@
 {
 	"name": "Page Turner", 
-	"version": "2.2",
+	"version": "2.3",
 	"manifest_version": 2,
 	"description": "Navigate paginated webpages using your keyboard's arrow keys. Perfect for search results, image galleries and more.",
 	"browser_action": { 
-		"default_icon": "icons/icon-inactive.png",
+		"default_icon": "icons/inactive.png",
 		"default_popup": "popup/popup.html"
 	},
 	"permissions": ["tabs", "storage", "http://*/*", "https://*/*"],
 	"web_accessible_resources": [
-		"icons/next.png", 
-		"icons/back.png"
+		"icons/arrow-next.png", 
+		"icons/arrow-back.png"
 	],
 	"icons": {
-		"16": "icons/icon-inactive.png",
+		"16": "icons/inactive.png",
 		"48": "icons/icon48.png",
 		"128": "icons/icon128.png" 
 	},

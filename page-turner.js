@@ -26,14 +26,14 @@
 
 	function getIcon() 
 	{
-		var icon = 'icon-inactive.png';
+		var icon = 'inactive.png';
 
 		if (back_link !== '' && next_link !== '') {
-			icon = 'icon-both.png';
+			icon = 'both.png';
 		} else if (back_link !== '' && next_link == '') {
-			icon = 'icon-back.png';
+			icon = 'back.png';
 		} else if (back_link == '' && next_link !== '') {
-			icon = 'icon-next.png';
+			icon = 'next.png';
 		}
 
 		return icon;
@@ -43,14 +43,14 @@
 	{
 		var click_icon = '';
 
-		if (direction == 'next' && icon == 'icon-both.png') {
-			click_icon = 'icon-both-click-next.png';
-		} else if (direction == 'next' && icon == 'icon-next.png') {
-			click_icon = 'icon-next-click.png';
-		} else if (direction == 'back' && icon == 'icon-both.png') {
-			click_icon = 'icon-both-click-back.png';
-		} else if (direction == 'back' && icon == 'icon-back.png') {
-			click_icon = 'icon-back-click.png';
+		if (direction == 'next' && icon == 'both.png') {
+			click_icon = 'both-c-next.png';
+		} else if (direction == 'next' && icon == 'next.png') {
+			click_icon = 'next-c.png';
+		} else if (direction == 'back' && icon == 'both.png') {
+			click_icon = 'both-c-back.png';
+		} else if (direction == 'back' && icon == 'back.png') {
+			click_icon = 'back-c.png';
 		}	
 
 		return click_icon;
@@ -114,7 +114,6 @@
 		// Cache DOM values
 		var next_page_arrow = $('#pt_next_page');
 		var back_page_arrow = $('#pt_back_page');
-
 
 		function addPrerenderLink(next_link)
 		{
