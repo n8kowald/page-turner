@@ -169,7 +169,7 @@
 		showArrows();
 
 		// Prerendering speeds up page-turning by preloading the next page
-		if (next_link !== '') addPrerenderLink(next_link);
+		//if (next_link !== '') addPrerenderLink(next_link);
 
 		// determine icon
 		icon = getIcon();
