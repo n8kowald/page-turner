@@ -136,12 +136,12 @@
 		}
 
 		// Search last links first
-		var links = document.links;
-		var last_link_array_num = links.length - 1;
+		var links = document.links,
+			last_link_array_num = links.length - 1;
 
 		// Iterate over the links in reverse order
 		for (i=last_link_array_num; i >= 0; i--) {
-			var a = links[i],
+			var a = links[i];
 			var link_text = a.textContent.replace(/[^a-z ]/gi, ' ').trim();
 			if (link_text == '') continue;
 			var words = link_text.split(' ');
