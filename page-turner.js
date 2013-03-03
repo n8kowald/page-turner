@@ -115,10 +115,12 @@
 		var next_page_arrow = $('#pt_next_page');
 		var back_page_arrow = $('#pt_back_page');
 
+		/*
 		function addPrerenderLink(next_link)
 		{
 			$('<link />', { 'rel': 'prerender', 'href': next_link }).appendTo('head');
 		}
+		*/
 
 		function showArrows()
 		{
