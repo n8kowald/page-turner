@@ -230,15 +230,14 @@
 		}
 
 		// Invalidate back/nexts if a Google search bar changed (results may have changed)
+		/*
 		var google_search = document.querySelectorAll('input[name$="q"]');
 		if (google_search[0]) {
 			google_search[0].onblur = function() {
-				console.log('getting here!');
 				getLinks();
-				console.log('Back: ' + back_link);
-				console.log('Next: ' + next_link);
 			}
 		}
+		*/
 
 	}
 

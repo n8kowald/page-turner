@@ -12,7 +12,7 @@ https://chrome.google.com/webstore/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgc
 ## TODO
 1. Improve promotional image:
  - Separate options onto secondary image  
-2.  Page arrows (if set) load when DOM fully loaded. On pages like IMDB's image gallery these appear after a considerable delay
+2. Google search results - when you enter a new query it needs to invalidate the initially captured back/next links
 
 ### Submit a bug
 https://github.com/n8kowald/page-turner/issues
