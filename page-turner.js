@@ -1,4 +1,4 @@
-(function($) {
+(function() {
 
 	var back_names = ['back', 'previous', 'prev'],
 		next_names = ['next', 'forward'],
@@ -105,17 +105,30 @@
 		chrome.extension.sendRequest({icon: icon});
 	}
 
-	$(document).ready(function() {
+	// DOM finished loading
+	if (document.addEventListener) {
+		document.addEventListener('DOMContentLoaded', init(), false);
+	}
+
+	function init() {
 
 		// Create arrows
-		$('<div class="pt_indicator" id="pt_next_page"/>').html('&nbsp;').appendTo(document.body);
-		$('<div class="pt_indicator" id="pt_back_page"/>').html('&nbsp;').appendTo(document.body);
-		//$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
-		//$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
+		var next = document.createElement('div');
+		next.setAttribute('class', 'pt_indicator');
+		next.setAttribute('id', 'pt_next_page');
+		next.innerHTML = '&nbsp;';
+
+		var back = document.createElement('div');
+		back.setAttribute('class', 'pt_indicator');
+		back.setAttribute('id', 'pt_back_page');
+		back.innerHTML = '&nbsp;';
+
+		document.body.appendChild(next);
+		document.body.appendChild(back);
 
 		// Cache arrow elements
-		var next_page_arrow = $('#pt_next_page');
-		var back_page_arrow = $('#pt_back_page');
+		var next_page_arrow = document.getElementById('pt_next_page');
+		var back_page_arrow = document.getElementById('pt_back_page');
 
 		/*
 		function addPrerenderLink(next_link)
@@ -128,45 +141,49 @@
 		{
 			chrome.storage.local.get('arrows', function(items) {
 				if (next_link !== '') {
-					next_page_arrow.addClass('visible');
-					if (items.arrows == 1 || first_run == 1) next_page_arrow.fadeIn();
+					next_page_arrow.className += ' visible';
+					if (items.arrows == 1 || first_run == 1) next_page_arrow.style.display = 'block';
 				}
 				if (back_link !== '') {
-					back_page_arrow.addClass('visible');
-					if (items.arrows == 1 || first_run == 1) back_page_arrow.fadeIn();
+					back_page_arrow.className += ' visible';
+					if (items.arrows == 1 || first_run == 1) back_page_arrow.style.display = 'block';
 				}
 			});
 
 		}
 
 		// Search last links first
-		var links = document.links,
-			last_link_array_num = links.length - 1;
+		function getLinks() {
+			var links = document.links,
+				last_link_array_num = links.length - 1;
 
-		// Iterate over the links in reverse order
-		for (i=last_link_array_num; i >= 0; i--) {
-			var a = links[i];
-			var link_text = a.textContent.replace(/[^a-z ]/gi, ' ').trim();
-			if (link_text == '') continue;
-			var words = link_text.split(' ');
-			// Links with more than two words are probably not pagination
-			// could even change to one word: requires MOAR testing
-			if (words.length > 2) continue;
-			// match on first word
-			var word = words[0].toLowerCase();
-			if (!all_words.inArray(word)) continue;
+			// Iterate over the links in reverse order
+			for (i=last_link_array_num; i >= 0; i--) {
+				var a = links[i];
+				var link_text = a.textContent.replace(/[^a-z ]/gi, ' ').trim();
+				if (link_text == '') continue;
+				var words = link_text.split(' ');
+				// Links with more than two words are probably not pagination
+				// could even change to one word: requires MOAR testing
+				if (words.length > 2) continue;
+				// match on first word
+				var word = words[0].toLowerCase();
+				if (!all_words.inArray(word)) continue;
 
-			// Found!
-			var type = getTypeFromWord(word);
-			// Set found links (if not set already)
-			var link = a.href;
-			if (!linkOfTypeExists(type) && typeof link !== 'undefined') {
-				setLink(type, link);
+				// Found!
+				var type = getTypeFromWord(word);
+				// Set found links (if not set already)
+				var link = a.href;
+				if (!linkOfTypeExists(type) && typeof link !== 'undefined') {
+					setLink(type, link);
+				}
+
+				// if back AND next links found: exit loop, we're done here
+				if (back_link !== '' && next_link !== '') break;
 			}
-
-			// if back AND next links found: exit loop, we're done here
-			if (back_link !== '' && next_link !== '') break;
 		}
+
+		getLinks();
 
 		// Show arrows (if preference is to show)
 		showArrows();
@@ -181,39 +198,48 @@
 		updateIcon(icon);
 
 		// Remove arrow divs if not used
-		if (back_link === '') back_page_arrow.remove();
-		if (next_link === '') next_page_arrow.remove();
+		if (back_link === '') back_page_arrow.parentNode.removeChild(back_page_arrow);
+		if (next_link === '') next_page_arrow.parentNode.removeChild(next_page_arrow);
 
 		//console.log('Back: ' + back_link);
 		//console.log('Next: ' + next_link);
 
-		$(window).on('resize', function() { 
-			back_page_arrow.css({'top':'50%'});
-			next_page_arrow.css({'top':'50%'});
-		});
+		window.onresize = function() {
+			back_page_arrow.style.top = '50%';
+			next_page_arrow.style.top = '50%';
+		}
 
 		// set keyboard shortcuts for back/next links
-		$(document).on('keydown', function(e) {
-
+		document.onkeydown = function(e) {
 			// Detect context. Don't want left/right keys to work if we're inside a form input
 			var element = document.activeElement;
 			if (!element instanceof HTMLBodyElement || element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true')) return;
 
 			// left arrow
 			if (e.keyCode == 37 && back_link !== '') {
-				back_page_arrow.addClass('clicked');
+				back_page_arrow.className += ' clicked';
 				updateIcon(getClickIcon(icon, 'back'));
 				document.location = back_link;
 			}
 			// right arrow
 			if (e.keyCode == 39 && next_link !== '') {
-				next_page_arrow.addClass('clicked');
+				next_page_arrow.className += ' clicked';
 				updateIcon(getClickIcon(icon, 'next'));
 				document.location = next_link;
 			}
+		}
 
-		});
+		// Invalidate back/nexts if a Google search bar changed (results may have changed)
+		var google_search = document.querySelectorAll('input[name$="q"]');
+		if (google_search[0]) {
+			google_search[0].onblur = function() {
+				console.log('getting here!');
+				getLinks();
+				console.log('Back: ' + back_link);
+				console.log('Next: ' + next_link);
+			}
+		}
 
-	});
+	}
 
-})(jQuery);
+})();
