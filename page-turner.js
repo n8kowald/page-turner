@@ -108,8 +108,10 @@
 	$(document).ready(function() {
 
 		// Create arrows
-		$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
-		$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
+		$('<div class="pt_indicator" id="pt_next_page"/>').html('&nbsp;').appendTo(document.body);
+		$('<div class="pt_indicator" id="pt_back_page"/>').html('&nbsp;').appendTo(document.body);
+		//$('<div/>', { 'id': 'pt_next_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
+		//$('<div/>', { 'id': 'pt_back_page', 'class': 'pt_indicator' }).html('&nbsp;').appendTo('body');	
 
 		// Cache arrow elements
 		var next_page_arrow = $('#pt_next_page');
