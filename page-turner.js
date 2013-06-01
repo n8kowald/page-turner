@@ -208,6 +208,8 @@
 					addPrerenderLink(next_link);
 				}
 			});
+			//console.log('Back: ' + back_link);
+			//console.log('Next: ' + next_link);
 		}
 
 		getLinks();
@@ -224,9 +226,6 @@
 		// Remove arrow divs if not used
 		if (back_link === '') back_page_arrow.parentNode.removeChild(back_page_arrow);
 		if (next_link === '') next_page_arrow.parentNode.removeChild(next_page_arrow);
-
-		//console.log('Back: ' + back_link);
-		//console.log('Next: ' + next_link);
 
 		window.onresize = function() {
 			back_page_arrow.style.top = '50%';
@@ -253,18 +252,18 @@
 			}
 		}
 
-		function invalidateLinks() {
+		function refetchLinks() {
 			back_link = '';
 			next_link = '';
 			getLinks();
 		}
 
-		// Invalidate back/nexts if a Google search changes page results (results may have changed)
+		// Invalidate back/nexts if a Google search changes page results
 		var google_search = document.querySelector('input[name=q]');
 		if (google_search) {
 			google_search.addEventListener('change', function() {
-				// Until I can detect new search result 'completion', a one second delay will do.
-				setTimeout(invalidateLinks, 1000);
+				// Until I can detect new search result 'completion', a one second delay before fetching new links works.
+				setTimeout(refetchLinks, 1000);
 			}, false);
 		}
 
