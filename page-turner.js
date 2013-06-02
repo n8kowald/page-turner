@@ -174,6 +174,13 @@
 
 		}
 
+		// Remove arrow divs if not used
+		function updateArrows() {
+			if (back_link === '') back_page_arrow.parentNode.removeChild(back_page_arrow);
+			if (next_link === '') next_page_arrow.parentNode.removeChild(next_page_arrow);
+		}
+
+
 		// Search last links first
 		function getLinks() {
 			var links = document.links,
@@ -210,22 +217,21 @@
 			});
 			//console.log('Back: ' + back_link);
 			//console.log('Next: ' + next_link);
+
+			// Show arrows (if preference is to show)
+			showArrows();
+
+			// determine icon
+			icon = getIcon();
+
+			// update extension icon
+			updateIcon(icon);
+
+			updateArrows();
+
 		}
 
 		getLinks();
-
-		// Show arrows (if preference is to show)
-		showArrows();
-
-		// determine icon
-		icon = getIcon();
-
-		// update extension icon
-		updateIcon(icon);
-
-		// Remove arrow divs if not used
-		if (back_link === '') back_page_arrow.parentNode.removeChild(back_page_arrow);
-		if (next_link === '') next_page_arrow.parentNode.removeChild(next_page_arrow);
 
 		window.onresize = function() {
 			back_page_arrow.style.top = '50%';
