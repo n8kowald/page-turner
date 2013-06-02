@@ -14,6 +14,7 @@
 			chrome.storage.local.set({'arrows':1}, function(){});
 		}
 	});
+
 	// If prerender preference not set: default to use
 	chrome.storage.local.get('prerender', function(items) {
 		if (items.prerender == undefined) {
@@ -114,18 +115,17 @@
 
 	// DOM finished loading
 	document.addEventListener('DOMContentLoaded', init(), false);
-
+		
 	function init() {
-
 		// Create arrows
-		var df = document.createDocumentFragment();
+		var df = document.createDocumentFragment(),
+			next = document.createElement('div'),
+			back = document.createElement('div');
 
-		var next = document.createElement('div');
 		next.setAttribute('class', 'pt_indicator');
 		next.id = 'pt_next_page';
 		next.innerHTML = '&nbsp;';
 
-		var back = document.createElement('div');
 		back.setAttribute('class', 'pt_indicator');
 		back.id = 'pt_back_page';
 		back.innerHTML = '&nbsp;';
@@ -175,14 +175,15 @@
 		}
 
 		// Remove arrow divs if not used
-		function updateArrows() {
+		function updateArrows() 
+		{
 			if (back_link === '') back_page_arrow.parentNode.removeChild(back_page_arrow);
 			if (next_link === '') next_page_arrow.parentNode.removeChild(next_page_arrow);
 		}
 
-
 		// Search last links first
-		function getLinks() {
+		function getLinks() 
+		{
 			var links = document.links,
 				last_link_array_num = links.length - 1;
 
@@ -215,8 +216,6 @@
 					addPrerenderLink(next_link);
 				}
 			});
-			//console.log('Back: ' + back_link);
-			//console.log('Next: ' + next_link);
 
 			// Show arrows (if preference is to show)
 			showArrows();
@@ -233,13 +232,15 @@
 
 		getLinks();
 
-		window.onresize = function() {
+		window.onresize = function() 
+		{
 			back_page_arrow.style.top = '50%';
 			next_page_arrow.style.top = '50%';
 		}
 
 		// set keyboard shortcuts for back/next links
-		document.onkeydown = function(e) {
+		document.onkeydown = function(e) 
+		{
 			// Detect context. Don't want left/right keys to work if we're inside a form input
 			var element = document.activeElement;
 			if (!element instanceof HTMLBodyElement || element.tagName == 'INPUT' || element.tagName == 'SELECT' || element.tagName == 'TEXTAREA' || (element.contentEditable && element.contentEditable == 'true')) return;
@@ -258,7 +259,8 @@
 			}
 		}
 
-		function refetchLinks() {
+		function refetchLinks() 
+		{
 			back_link = '';
 			next_link = '';
 			getLinks();
