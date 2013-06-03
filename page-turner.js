@@ -116,7 +116,8 @@
 	// DOM finished loading
 	document.addEventListener('DOMContentLoaded', init(), false);
 		
-	function init() {
+	function init() 
+	{
 		// Create arrows
 		var df = document.createDocumentFragment(),
 			next = document.createElement('div'),
@@ -177,8 +178,8 @@
 		// Remove arrow divs if not used
 		function updateArrows() 
 		{
-			if (back_link === '') back_page_arrow.parentNode.removeChild(back_page_arrow);
-			if (next_link === '') next_page_arrow.parentNode.removeChild(next_page_arrow);
+			if (back_link === '' && back_page_arrow.parentNode !== null) back_page_arrow.parentNode.removeChild(back_page_arrow);
+			if (next_link === '' && next_page_arrow.parentNode !== null) next_page_arrow.parentNode.removeChild(next_page_arrow);
 		}
 
 		// Search last links first

@@ -1,11 +1,3 @@
-@keyframes fadein {
-	from { opacity:0; }
-	to { opacity:1; }
-}
-@-webkit-keyframes fadein {
-	from { opacity:0; }
-	to { opacity:1; }
-}
 .pt_indicator {
 	display:none;
 	position:fixed;
@@ -15,8 +7,6 @@
 	/* Null transform hack prevents repaint caused by arrows */
 	-webkit-transform:translatez(0);
 	transform:translatez(0);
-	animation:fadein 1.5s;
-	-webkit-animation:fadein 1.5s;
 }
 #pt_next_page {
 	display:none;
