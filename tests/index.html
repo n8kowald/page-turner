@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Page Turner Tests</title>
+	<link rel="stylesheet" href="qunit.css" type="text/css" media="screen">
+</head>
+<body>
+	<div id="qunit"></div>
+	<div id="qunit-fixture"></div>
+
+	<h1>README</h1>
+	<p>You must first comment out the immediate function inside page-turner.js for tests to access code and run successfully.</p>
+	<p>//(function() {<br> //})();</p>
+	<h2>Links</h2>
+	<ul>
+		<li class="back"><a href="previous.html">Previous</a></li>
+		<li><a href="cats.html">Cats</a></li>
+		<li><a href="dummy.html">Dummy</a></li>
+		<li><a href="next.html">Next</a></li>
+		<li class="back"><a href="back.html">Back</a></li>
+		<li><a href="#">Back</a></li>
+	</ul>
+	<script>
+		// Setup a keydown event (up) to test that it's not being overwritten
+		var one = '1', two = '2', three = '3', four = '4', five = '5', six = '6';
+		document.onkeydown = function(one, two, three, four, five) {var test = true};
+		window.onresize = function(one, two, three, four, five, six) {var test = true};
+
+		// Setup chrome local storage methods so test doesn't error
+		var chrome = chrome || {};
+		chrome.storage = chrome.storage || function(){};
+		chrome.storage.local = chrome.storage.local || function(){};
+		chrome.storage.local.get = chrome.storage.local.get || function(){};
+		chrome.storage.local.set = chrome.storage.local.set || function(){};
+
+	</script>
+	<!-- main page turner functions -->
+	<script src="../page-turner.js"></script>
+	<script src="qunit.js"></script>
+	<script src="tests.js"></script>
+</body>
+</html>
