@@ -16,6 +16,5 @@ chrome.tabs.onActivated.addListener(function(tab) {
 });
 // Avoid storing icon data for closed tabs
 chrome.tabs.onRemoved.addListener(function(tab){
-	console.log('deleting page icon cache stored in tabID' + tab.tabId + ' = '  + page_icon[tab.tabId]);
 	delete page_icon[tab.tabId];
 });
