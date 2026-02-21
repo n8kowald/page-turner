@@ -1,8 +1,8 @@
 chrome.storage.local.get('arrows', function(items) {
-	var back_arrow = document.getElementById('pt_back_page'),
+	let back_arrow = document.getElementById('pt_back_page'),
 		next_arrow = document.getElementById('pt_next_page');
 
-	if (items.arrows == 0) {
+	if (items.arrows === 0) {
 		if (back_arrow !== null) back_arrow.style.display = 'none';
 		if (next_arrow !== null) next_arrow.style.display = 'none';
 	} else {
@@ -13,11 +13,12 @@ chrome.storage.local.get('arrows', function(items) {
 			next_arrow.style.display = 'block';
 		}
 	}
+
 	// Reload prerender if found
 	// Next page must be reloaded after a settings change
-	var pre_link = document.getElementById('ptpr');
+	let pre_link = document.getElementById('ptpr');
 	if (pre_link !== null) {
-		var pre_href = pre_link.getAttributeNode('href').nodeValue;
+		let pre_href = pre_link.getAttributeNode('href').nodeValue;
 		if (pre_href.slice(-1) !== '#') pre_href += '#';
 		pre_link.href = pre_href;
 	}

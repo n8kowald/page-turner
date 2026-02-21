@@ -1,20 +1,69 @@
-var page_icon = [];
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
-	// Don't change extension icon when pages are prerendered
-	if (sender.tab.active === true) {
-		chrome.browserAction.setIcon({path: 'icons/' + request.icon});
-	}
-	// Save icon state for prerendered requests
-	page_icon[sender.tab.id] = request.icon;
+// MV3 service worker background script
+
+// In MV3, the service worker can be suspended at any time, so we keep a small
+// in-memory cache AND persist per-tab icon state in storage.session (if available).
+
+const ICON_DEFAULT = 'icons/inactive.png';
+
+// Prefer storage.session (not persisted across browser restarts) for tab state.
+// Fallback to storage.local if session isn't available in the current environment.
+const tabStateStorage = (chrome.storage && chrome.storage.session) ? chrome.storage.session : chrome.storage.local;
+
+const iconCache = new Map(); // tabId -> icon filename, e.g. 'next.png'
+
+function setTabIcon(tabId, iconFile) {
+  const path = 'icons/' + iconFile;
+  chrome.action.setIcon({ tabId, path });
+}
+
+async function rememberTabIcon(tabId, iconFile) {
+  iconCache.set(tabId, iconFile);
+  await tabStateStorage.set({ ['page_turner_icon_' + tabId]: iconFile });
+}
+
+async function recallTabIcon(tabId) {
+  if (iconCache.has(tabId)) return iconCache.get(tabId);
+
+  const key = 'page_turner_icon_' + tabId;
+  const data = await tabStateStorage.get(key);
+  const iconFile = data[key];
+  if (iconFile) iconCache.set(tabId, iconFile);
+  return iconFile;
+}
+
+// Messages from the content script tell us what icon to show for the current tab.
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (!request || !request.icon) return;
+
+  const tabId = sender && sender.tab && sender.tab.id;
+  if (typeof tabId !== 'number') return;
+
+  // Don't change extension icon when pages are prerendered.
+  // In MV3, sender.tab.active is usually available; if not, we still remember state.
+  const isActive = sender.tab && sender.tab.active === true;
+
+  (async () => {
+    if (isActive) setTabIcon(tabId, request.icon);
+    await rememberTabIcon(tabId, request.icon);
+  })();
+
+  // No async response needed.
 });
-chrome.tabs.onActivated.addListener(function(tab) {
-	if (typeof page_icon[tab.tabId] !== 'undefined') {
-		chrome.browserAction.setIcon({path: 'icons/' + page_icon[tab.tabId]});
-	} else {
-		chrome.browserAction.setIcon({path: 'icons/inactive.png'});
-	}
+
+// When user switches tabs, restore the last-known icon for that tab (or default).
+chrome.tabs.onActivated.addListener(({ tabId }) => {
+  (async () => {
+    const iconFile = await recallTabIcon(tabId);
+    if (iconFile) {
+      setTabIcon(tabId, iconFile);
+    } else {
+      chrome.action.setIcon({ tabId, path: ICON_DEFAULT });
+    }
+  })();
 });
-// Avoid storing icon data for closed tabs
-chrome.tabs.onRemoved.addListener(function(tab){
-	delete page_icon[tab.tabId];
+
+// Avoid storing icon data for closed tabs.
+chrome.tabs.onRemoved.addListener((tabId) => {
+  iconCache.delete(tabId);
+  tabStateStorage.remove('page_turner_icon_' + tabId);
 });
