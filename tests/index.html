@@ -9,9 +9,6 @@
 	<div id="qunit"></div>
 	<div id="qunit-fixture"></div>
 
-	<h1>README</h1>
-	<p>You must first comment out the immediate function inside page-turner.js for tests to access code and run successfully.</p>
-	<p>//(function() {<br> //})();</p>
 	<h2>Links</h2>
 	<ul>
 		<li class="back"><a href="previous.html">Previous</a></li>
@@ -23,17 +20,25 @@
 	</ul>
 	<script>
 		// Setup a keydown event (up) to test that it's not being overwritten
-		var one = '1', two = '2', three = '3', four = '4', five = '5', six = '6';
-		document.onkeydown = function(one, two, three, four, five) {var test = true};
-		window.onresize = function(one, two, three, four, five, six) {var test = true};
+		const one = '1', two = '2', three = '3', four = '4', five = '5', six = '6';
+		document.onkeydown = function(one, two, three, four, five) {let test = true};
+		window.onresize = function(one, two, three, four, five, six) {let test = true};
 
-		// Setup chrome local storage methods so test doesn't error
-		var chrome = chrome || {};
-		chrome.storage = chrome.storage || function(){};
-		chrome.storage.local = chrome.storage.local || function(){};
-		chrome.storage.local.get = chrome.storage.local.get || function(){};
-		chrome.storage.local.set = chrome.storage.local.set || function(){};
+		// Minimal Chrome API stubs so page-turner.js can run in a normal browser.
+		// IMPORTANT: Don't redeclare `chrome` (Chrome already defines window.chrome).
+		window.chrome = window.chrome || {};
+		window.chrome.runtime = window.chrome.runtime || {};
+		window.chrome.runtime.sendMessage = window.chrome.runtime.sendMessage || function () {};
+		window.chrome.storage = window.chrome.storage || {};
+		window.chrome.storage.local = window.chrome.storage.local || {};
 
+		// Provide callback shapes similar to the real API.
+		window.chrome.storage.local.get = window.chrome.storage.local.get || function (key, cb) {
+			if (typeof cb === 'function') cb({});
+		};
+		window.chrome.storage.local.set = window.chrome.storage.local.set || function (obj, cb) {
+			if (typeof cb === 'function') cb();
+		};
 	</script>
 	<!-- main page turner functions -->
 	<script src="../page-turner.js"></script>
