@@ -561,19 +561,33 @@
         // Expose submit helper for tests of button/form pagination.
         window.PageTurner._submitForm = submitForm;
     }
-    // Apply the "show page arrows" setting immediately when changed from the
-    // popup (replaces the MV2-era executeScript re-injection of content_script.js)
+    // Apply settings immediately when changed from the popup (replaces the
+    // MV2-era executeScript re-injection of content_script.js)
     if (chrome_api && chrome_api.storage && chrome_api.storage.onChanged) {
         chrome_api.storage.onChanged.addListener(function (changes, area) {
-            if (area !== 'local' || !changes.arrows) {
+            if (area !== 'local') {
                 return;
             }
-            const show = changes.arrows.newValue === 1;
-            [back_page_arrow, next_page_arrow].forEach(function (arrow) {
-                if (arrow && arrow.classList && arrow.classList.contains('visible')) {
-                    arrow.style.display = show ? 'block' : 'none';
+
+            if (changes.arrows) {
+                const show = changes.arrows.newValue === 1;
+                [back_page_arrow, next_page_arrow].forEach(function (arrow) {
+                    if (arrow && arrow.classList && arrow.classList.contains('visible')) {
+                        arrow.style.display = show ? 'block' : 'none';
+                    }
+                });
+            }
+
+            if (changes.prerender) {
+                const ptpr = document.getElementById('ptpr');
+                if (changes.prerender.newValue === 1) {
+                    if (next_link !== '') {
+                        addPrerenderLink(next_link);
+                    }
+                } else if (ptpr && ptpr.parentNode) {
+                    ptpr.parentNode.removeChild(ptpr);
                 }
-            });
+            }
         });
     }
 
