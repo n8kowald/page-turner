@@ -561,6 +561,22 @@
         // Expose submit helper for tests of button/form pagination.
         window.PageTurner._submitForm = submitForm;
     }
+    // Apply the "show page arrows" setting immediately when changed from the
+    // popup (replaces the MV2-era executeScript re-injection of content_script.js)
+    if (chrome_api && chrome_api.storage && chrome_api.storage.onChanged) {
+        chrome_api.storage.onChanged.addListener(function (changes, area) {
+            if (area !== 'local' || !changes.arrows) {
+                return;
+            }
+            const show = changes.arrows.newValue === 1;
+            [back_page_arrow, next_page_arrow].forEach(function (arrow) {
+                if (arrow && arrow.classList && arrow.classList.contains('visible')) {
+                    arrow.style.display = show ? 'block' : 'none';
+                }
+            });
+        });
+    }
+
 // Invalidate back/nexts if a Google search changes page results
     const google_search = document.querySelector('input[name=q]');
     if (google_search) {
