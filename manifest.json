@@ -1,6 +1,6 @@
 {
   "name": "Page Turner",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "manifest_version": 3,
   "description": "Navigate paginated webpages using your keyboard's arrow keys. Perfect for search results, image galleries and more.",
   "action": {
