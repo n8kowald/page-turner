@@ -4,25 +4,26 @@
 	top:50%;
 	width:30px;
 	height:62px;
+	background-repeat:no-repeat;
+	background-position:0 0;
+	background-size:30px 62px;
 	/* Null transform hack prevents repaint caused by arrows */
 	-webkit-transform:translatez(0);
 	transform:translatez(0);
 }
 #pt_next_page {
-	display:none;
 	right:35px;
 	z-index:314159;
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-next.png) no-repeat 0 0;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 62'%3E%3Cpath d='M7 9l17 22L7 53' fill='none' stroke='%23c9c9c9' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 #pt_back_page {
-	display:none;
 	left:25px;
 	z-index:3141592;
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-back.png) no-repeat 0 0;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 62'%3E%3Cpath d='M23 9L6 31l17 22' fill='none' stroke='%23c9c9c9' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 #pt_next_page.clicked {
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-next.png) no-repeat 0 -62px;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 62'%3E%3Cpath d='M7 9l17 22L7 53' fill='none' stroke='%236e6e6e' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 #pt_back_page.clicked {
-	background:transparent url(chrome-extension://__MSG_@@extension_id__/icons/arrow-back.png) no-repeat 0 -62px;
+	background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 62'%3E%3Cpath d='M23 9L6 31l17 22' fill='none' stroke='%236e6e6e' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }

@@ -15,18 +15,6 @@
     "http://*/*",
     "https://*/*"
   ],
-  "web_accessible_resources": [
-    {
-      "resources": [
-        "icons/arrow-next.png",
-        "icons/arrow-back.png"
-      ],
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ]
-    }
-  ],
   "icons": {
     "16": "icons/inactive.png",
     "48": "icons/icon48.png",
