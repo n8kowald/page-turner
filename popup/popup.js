@@ -14,14 +14,14 @@
 			updatePrerenderRadios(items.prerender);
 		});
 
-		function saveOptions() 
+		function saveOptions()
 		{
 			var arrow_pref = (spa_yes.checked) ? 1 : 0,
 				prerender_pref = (pr_yes.checked) ? 1 : 0;
-			// remove or show arrows immediately
-			chrome.tabs.executeScript(null, {file: "content_script.js"});
+			// page-turner.js listens for storage changes and shows/hides
+			// arrows immediately (chrome.tabs.executeScript was removed in MV3)
 			chrome.storage.local.set({
-				'arrows':arrow_pref, 
+				'arrows':arrow_pref,
 				'prerender':prerender_pref
 			}, function() {});
 		}

@@ -162,38 +162,46 @@
         runtime_send_message({icon: nextIcon});
     }
 
+    // Prerender via the Speculation Rules API. The old <link rel="prerender">
+    // was removed from Chrome and silently did nothing.
+    function supportsSpeculationRules() {
+        return typeof HTMLScriptElement !== 'undefined' &&
+            typeof HTMLScriptElement.supports === 'function' &&
+            HTMLScriptElement.supports('speculationrules');
+    }
+
+    function removePrerenderLink() {
+        const el = document.getElementById('ptpr');
+        if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
+    }
+
     function addPrerenderLink(url) {
-        const ptpr = document.getElementById('ptpr');
-        if (ptpr !== null) {
-            ptpr.href = url;
+        if (!supportsSpeculationRules()) {
             return;
         }
 
-        // If a prerender link exists: update the href
-        const el = document.querySelector('link[rel=prerender]');
-        if (el !== null) {
-            el.href = url;
-            return;
-        }
+        // Replace any previous rule set (rules can't be edited in place)
+        removePrerenderLink();
 
-        // No prerender exists: create it
-        const l = document.createElement('link');
-        l.rel = 'prerender';
-        l.href = url;
-        l.id = 'ptpr';
-        document.getElementsByTagName('head')[0].appendChild(l);
+        const s = document.createElement('script');
+        s.type = 'speculationrules';
+        s.id = 'ptpr';
+        s.textContent = JSON.stringify({prerender: [{urls: [url]}]});
+        (document.head || document.documentElement).appendChild(s);
     }
 
     function showArrows() {
         chrome.storage.local.get('arrows', function (items) {
 
             if (hasNext() && next_page_arrow) {
-                next_page_arrow.className += ' visible';
+                next_page_arrow.classList.add('visible');
                 if (items.arrows == 1 || first_run == 1) next_page_arrow.style.display = 'block';
             }
 
             if (hasBack() && back_page_arrow) {
-                back_page_arrow.className += ' visible';
+                back_page_arrow.classList.add('visible');
                 if (items.arrows == 1 || first_run == 1) back_page_arrow.style.display = 'block';
             }
 
@@ -387,6 +395,17 @@
         return false;
     }
 
+    // Show click feedback on an arrow, clearing it after the sprite has been
+    // seen so the state can re-fire on pages that don't unload (e.g. # links)
+    function flashClicked(arrow) {
+        if (!arrow || !arrow.classList) return;
+        arrow.classList.remove('clicked');
+        arrow.classList.add('clicked');
+        setTimeout(function () {
+            arrow.classList.remove('clicked');
+        }, 250);
+    }
+
     function init() {
         if (has_init) {
             return;
@@ -475,7 +494,7 @@
         if (e.key === 'ArrowLeft' && hasBack()) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            back_page_arrow.className += ' clicked';
+            flashClicked(back_page_arrow);
             updateIcon(getClickIcon('back'));
             if (back_link !== '') {
                 document.location = back_link;
@@ -488,7 +507,7 @@
         if (e.key === 'ArrowRight' && hasNext()) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            next_page_arrow.className += ' clicked';
+            flashClicked(next_page_arrow);
             updateIcon(getClickIcon('next'));
             if (next_link !== '') {
                 document.location = next_link;
@@ -561,6 +580,35 @@
         // Expose submit helper for tests of button/form pagination.
         window.PageTurner._submitForm = submitForm;
     }
+    // Apply settings immediately when changed from the popup (replaces the
+    // MV2-era executeScript re-injection of content_script.js)
+    if (chrome_api && chrome_api.storage && chrome_api.storage.onChanged) {
+        chrome_api.storage.onChanged.addListener(function (changes, area) {
+            if (area !== 'local') {
+                return;
+            }
+
+            if (changes.arrows) {
+                const show = changes.arrows.newValue === 1;
+                [back_page_arrow, next_page_arrow].forEach(function (arrow) {
+                    if (arrow && arrow.classList && arrow.classList.contains('visible')) {
+                        arrow.style.display = show ? 'block' : 'none';
+                    }
+                });
+            }
+
+            if (changes.prerender) {
+                if (changes.prerender.newValue === 1) {
+                    if (next_link !== '') {
+                        addPrerenderLink(next_link);
+                    }
+                } else {
+                    removePrerenderLink();
+                }
+            }
+        });
+    }
+
 // Invalidate back/nexts if a Google search changes page results
     const google_search = document.querySelector('input[name=q]');
     if (google_search) {

@@ -5,6 +5,19 @@
 
 const ICON_DEFAULT = 'icons/inactive.png';
 
+// Only icon filenames the content script legitimately reports (getIcon /
+// getClickIcon in page-turner.js) may reach chrome.action.setIcon.
+const VALID_ICONS = new Set([
+  'inactive.png',
+  'back.png',
+  'next.png',
+  'both.png',
+  'back-c.png',
+  'next-c.png',
+  'both-c-back.png',
+  'both-c-next.png',
+]);
+
 // Prefer storage.session (not persisted across browser restarts) for tab state.
 // Fallback to storage.local if session isn't available in the current environment.
 const tabStateStorage = (chrome.storage && chrome.storage.session) ? chrome.storage.session : chrome.storage.local;
@@ -33,7 +46,7 @@ async function recallTabIcon(tabId) {
 
 // Messages from the content script tell us what icon to show for the current tab.
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (!request || !request.icon) return;
+  if (!request || !VALID_ICONS.has(request.icon)) return;
 
   const tabId = sender && sender.tab && sender.tab.id;
   if (typeof tabId !== 'number') return;
@@ -62,8 +75,29 @@ chrome.tabs.onActivated.addListener(({ tabId }) => {
   })();
 });
 
-// Avoid storing icon data for closed tabs.
+// Avoid storing icon data for closed tabs. Chrome reuses tab IDs, so a
+// leaked entry could briefly show a stale icon on an unrelated new tab.
 chrome.tabs.onRemoved.addListener((tabId) => {
   iconCache.delete(tabId);
-  tabStateStorage.remove('page_turner_icon_' + tabId);
+  (async () => {
+    try {
+      await tabStateStorage.remove('page_turner_icon_' + tabId);
+    } catch (e) {
+      // Storage can be unavailable during browser shutdown; the startup
+      // sweep below handles anything left behind.
+    }
+  })();
 });
+
+// storage.session resets itself each browser session, but the storage.local
+// fallback persists - sweep stale per-tab icon state from previous sessions.
+// Tab IDs are not stable across restarts, so all of it is stale by definition.
+if (tabStateStorage === chrome.storage.local) {
+  chrome.runtime.onStartup.addListener(() => {
+    (async () => {
+      const all = await chrome.storage.local.get(null);
+      const stale = Object.keys(all).filter((k) => k.startsWith('page_turner_icon_'));
+      if (stale.length) await chrome.storage.local.remove(stale);
+    })();
+  });
+}
