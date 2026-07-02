@@ -5,6 +5,19 @@
 
 const ICON_DEFAULT = 'icons/inactive.png';
 
+// Only icon filenames the content script legitimately reports (getIcon /
+// getClickIcon in page-turner.js) may reach chrome.action.setIcon.
+const VALID_ICONS = new Set([
+  'inactive.png',
+  'back.png',
+  'next.png',
+  'both.png',
+  'back-c.png',
+  'next-c.png',
+  'both-c-back.png',
+  'both-c-next.png',
+]);
+
 // Prefer storage.session (not persisted across browser restarts) for tab state.
 // Fallback to storage.local if session isn't available in the current environment.
 const tabStateStorage = (chrome.storage && chrome.storage.session) ? chrome.storage.session : chrome.storage.local;
@@ -33,7 +46,7 @@ async function recallTabIcon(tabId) {
 
 // Messages from the content script tell us what icon to show for the current tab.
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (!request || !request.icon) return;
+  if (!request || !VALID_ICONS.has(request.icon)) return;
 
   const tabId = sender && sender.tab && sender.tab.id;
   if (typeof tabId !== 'number') return;
