@@ -75,8 +75,29 @@ chrome.tabs.onActivated.addListener(({ tabId }) => {
   })();
 });
 
-// Avoid storing icon data for closed tabs.
+// Avoid storing icon data for closed tabs. Chrome reuses tab IDs, so a
+// leaked entry could briefly show a stale icon on an unrelated new tab.
 chrome.tabs.onRemoved.addListener((tabId) => {
   iconCache.delete(tabId);
-  tabStateStorage.remove('page_turner_icon_' + tabId);
+  (async () => {
+    try {
+      await tabStateStorage.remove('page_turner_icon_' + tabId);
+    } catch (e) {
+      // Storage can be unavailable during browser shutdown; the startup
+      // sweep below handles anything left behind.
+    }
+  })();
 });
+
+// storage.session resets itself each browser session, but the storage.local
+// fallback persists - sweep stale per-tab icon state from previous sessions.
+// Tab IDs are not stable across restarts, so all of it is stale by definition.
+if (tabStateStorage === chrome.storage.local) {
+  chrome.runtime.onStartup.addListener(() => {
+    (async () => {
+      const all = await chrome.storage.local.get(null);
+      const stale = Object.keys(all).filter((k) => k.startsWith('page_turner_icon_'));
+      if (stale.length) await chrome.storage.local.remove(stale);
+    })();
+  });
+}
