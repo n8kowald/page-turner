@@ -162,26 +162,34 @@
         runtime_send_message({icon: nextIcon});
     }
 
+    // Prerender via the Speculation Rules API. The old <link rel="prerender">
+    // was removed from Chrome and silently did nothing.
+    function supportsSpeculationRules() {
+        return typeof HTMLScriptElement !== 'undefined' &&
+            typeof HTMLScriptElement.supports === 'function' &&
+            HTMLScriptElement.supports('speculationrules');
+    }
+
+    function removePrerenderLink() {
+        const el = document.getElementById('ptpr');
+        if (el && el.parentNode) {
+            el.parentNode.removeChild(el);
+        }
+    }
+
     function addPrerenderLink(url) {
-        const ptpr = document.getElementById('ptpr');
-        if (ptpr !== null) {
-            ptpr.href = url;
+        if (!supportsSpeculationRules()) {
             return;
         }
 
-        // If a prerender link exists: update the href
-        const el = document.querySelector('link[rel=prerender]');
-        if (el !== null) {
-            el.href = url;
-            return;
-        }
+        // Replace any previous rule set (rules can't be edited in place)
+        removePrerenderLink();
 
-        // No prerender exists: create it
-        const l = document.createElement('link');
-        l.rel = 'prerender';
-        l.href = url;
-        l.id = 'ptpr';
-        document.getElementsByTagName('head')[0].appendChild(l);
+        const s = document.createElement('script');
+        s.type = 'speculationrules';
+        s.id = 'ptpr';
+        s.textContent = JSON.stringify({prerender: [{urls: [url]}]});
+        (document.head || document.documentElement).appendChild(s);
     }
 
     function showArrows() {
@@ -590,13 +598,12 @@
             }
 
             if (changes.prerender) {
-                const ptpr = document.getElementById('ptpr');
                 if (changes.prerender.newValue === 1) {
                     if (next_link !== '') {
                         addPrerenderLink(next_link);
                     }
-                } else if (ptpr && ptpr.parentNode) {
-                    ptpr.parentNode.removeChild(ptpr);
+                } else {
+                    removePrerenderLink();
                 }
             }
         });
