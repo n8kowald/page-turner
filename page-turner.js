@@ -188,12 +188,12 @@
         chrome.storage.local.get('arrows', function (items) {
 
             if (hasNext() && next_page_arrow) {
-                next_page_arrow.className += ' visible';
+                next_page_arrow.classList.add('visible');
                 if (items.arrows == 1 || first_run == 1) next_page_arrow.style.display = 'block';
             }
 
             if (hasBack() && back_page_arrow) {
-                back_page_arrow.className += ' visible';
+                back_page_arrow.classList.add('visible');
                 if (items.arrows == 1 || first_run == 1) back_page_arrow.style.display = 'block';
             }
 
@@ -387,6 +387,17 @@
         return false;
     }
 
+    // Show click feedback on an arrow, clearing it after the sprite has been
+    // seen so the state can re-fire on pages that don't unload (e.g. # links)
+    function flashClicked(arrow) {
+        if (!arrow || !arrow.classList) return;
+        arrow.classList.remove('clicked');
+        arrow.classList.add('clicked');
+        setTimeout(function () {
+            arrow.classList.remove('clicked');
+        }, 250);
+    }
+
     function init() {
         if (has_init) {
             return;
@@ -475,7 +486,7 @@
         if (e.key === 'ArrowLeft' && hasBack()) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            back_page_arrow.className += ' clicked';
+            flashClicked(back_page_arrow);
             updateIcon(getClickIcon('back'));
             if (back_link !== '') {
                 document.location = back_link;
@@ -488,7 +499,7 @@
         if (e.key === 'ArrowRight' && hasNext()) {
             e.preventDefault();
             e.stopImmediatePropagation();
-            next_page_arrow.className += ' clicked';
+            flashClicked(next_page_arrow);
             updateIcon(getClickIcon('next'));
             if (next_link !== '') {
                 document.location = next_link;
