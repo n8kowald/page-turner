@@ -2,7 +2,7 @@
   "name": "Page Turner",
   "version": "4.1.0",
   "manifest_version": 3,
-  "description": "Turn paginated webpages with your keyboard's arrow keys. Perfect for search results, image galleries and more.",
+  "description": "Navigate paginated webpages with your keyboard's arrow keys. Perfect for search results, image galleries and more.",
   "action": {
     "default_icon": "icons/inactive.png",
     "default_popup": "popup/popup.html"

@@ -25,27 +25,51 @@ Generate GitHub release notes for Page Turner in the established house style: us
    - **Under the hood** — internal cleanup, dead-code removal, dependency/manifest changes, and anything that affects permissions.
    Drop purely mechanical commits (version bumps, formatting-only, `.DS_Store`) unless they matter to users. Omit any section that has no items.
 
-5. **Write the notes** in the format below.
+5. **Write the notes** to `release-notes/v<VERSION>.md` in the format below (see the existing `release-notes/v4.1.0.md` as the reference for exact formatting).
 
 ## Format
 
-```
-Page Turner <version>
+Markdown, using this exact structure:
+
+```markdown
+# Page Turner <version>
+
 <One- or two-sentence summary of the release's character. Name the release type
 (patch / minor / major) and the headline theme. Plain, confident, no marketing fluff.>
 
-Bug fixes
-<Symptom-first lead> — <what was actually wrong, in plain terms, and confirmation it now works>. …
-…
+## Bug fixes
 
-Improvements
-<Short lead> — <benefit to the user>. …
-…
+**<Symptom-first lead>**
+<What was actually wrong, in plain terms, and confirmation it now works. Explanation
+sits on its own line(s) directly under the bold lead — no bullet, no inline em-dash.>
 
-Under the hood
-<Internal change, one line each>.
-No new permissions requested — <or, if permissions changed, state exactly what changed>.
+**<Next symptom-first lead>**
+<Explanation.>
+
+## Improvements
+
+**<Short lead>** — <benefit to the user, inline after an em-dash>. May be followed by
+sub-bullets when the item covers several cases:
+
+- **<Case>** — <detail>.
+- **<Case>** — <detail>.
+
+## Under the hood
+
+- <Internal change, one line each.>
+- No new permissions requested — <or, if permissions changed, state exactly what changed>.
+
+### Full Changelog
+https://github.com/n8kowald/page-turner/compare/<previous-version>...<version>
 ```
+
+Formatting rules:
+- **Headings:** `#` for the title, `##` for each section, `###` for Full Changelog.
+- **Bug fixes** use the bold-lead-on-its-own-line style (lead, then explanation on the next line) — not a bulleted list, not an inline em-dash.
+- **Improvements** use the inline `**Lead** — explanation` style, with optional sub-bullets.
+- **Under the hood** is a bulleted list; the last bullet is always the permissions statement.
+- **Full Changelog** compares the previous git tag to this version. Tags are bare version numbers (e.g. `4.0.1...4.1.0`), even though the note filename is `v`-prefixed.
+- Omit any section (Bug fixes / Improvements / Under the hood) that has no items.
 
 ## Voice
 
@@ -53,9 +77,8 @@ No new permissions requested — <or, if permissions changed, state exactly what
 - **Explain root causes in accessible terms** but keep the real technical detail (API names, the actual mechanism) for readers who want it.
 - **User benefit over implementation.** "crisp at any zoom level and on high-DPI displays" beats "replaced PNG with SVG."
 - **Confident and plain.** No exclamation marks, no "we're excited to," no emoji.
-- **Bold the lead phrase** of each Bug fix / Improvement item using `**…**` so it scans on GitHub. (The plain-text example above omits the markers for readability.)
 - **Always close with a permissions statement** under "Under the hood" — either that no new permissions were requested, or precisely what changed. This is a browser extension; permission changes are the thing users scrutinize most.
 
 ## After drafting
 
-Show the notes to the user for review. Do not create the git tag or publish the GitHub release unless asked; if asked, use `gh release create <version>`.
+Show the notes to the user for review. The notes live at `release-notes/v<VERSION>.md`. Do not create the git tag or publish the GitHub release unless asked; if asked, use `gh release create <version> --notes-file release-notes/v<VERSION>.md`.

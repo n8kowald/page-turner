@@ -457,3 +457,112 @@ test('Form matched via aria-label uses its submit button as submitter (Startpage
     ok(submittedWith === btn, 'requestSubmit should be called with the submit button');
 });
 
+test('Submit inputs are matched by their value label (DuckDuckGo HTML)', function () {
+    // Neutralise existing pagination links
+    const anchors = document.querySelectorAll('a');
+    for (let i = 0; i < anchors.length; i++) {
+        anchors[i].setAttribute('href', '#');
+    }
+
+    const fixture = document.getElementById('qunit-fixture');
+    fixture.innerHTML = '';
+
+    // DuckDuckGo HTML paginates with <input type="submit" value="Next">
+    // inside plain divs (no pagination container), so the label lives in the
+    // value attribute and only the whole-page fallback scan reaches it.
+    function navForm(value) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'nav-link';
+        const form = document.createElement('form');
+        form.action = '/html/';
+        form.method = 'post';
+        const submit = document.createElement('input');
+        submit.type = 'submit';
+        submit.value = value;
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'q';
+        hidden.value = 'test';
+        form.appendChild(submit);
+        form.appendChild(hidden);
+        wrapper.appendChild(form);
+        return { wrapper: wrapper, form: form, submit: submit };
+    }
+
+    const prev = navForm('Previous');
+    const next = navForm('Next');
+    fixture.appendChild(prev.wrapper);
+    fixture.appendChild(next.wrapper);
+
+    let submittedWith;
+    next.form.requestSubmit = function (submitter) {
+        submittedWith = submitter;
+    };
+
+    PageTurner.refetchLinks();
+
+    ok(PageTurner.getState().back_form === prev.form, 'Previous form should be detected');
+    ok(PageTurner.getState().next_form === next.form, 'Next form should be detected');
+    ok(PageTurner.getState().next_submitter === next.submit, 'Submitter must be the submit input');
+
+    // ArrowRight must submit the Next form with its submit input
+    const ev = new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true });
+    document.dispatchEvent(ev);
+
+    ok(submittedWith === next.submit, 'requestSubmit should be called with the submit input');
+});
+
+test('Icon-only anchor labelled via aria-label is stored as a link (eBay)', function () {
+    // Neutralise existing pagination links
+    const anchors = document.querySelectorAll('a');
+    for (let i = 0; i < anchors.length; i++) {
+        anchors[i].setAttribute('href', '#');
+    }
+
+    const fixture = document.getElementById('qunit-fixture');
+    fixture.innerHTML = '';
+
+    // eBay-style pagination: an icon-only <a> with no text and no rel="next",
+    // labelled only by aria-label, inside a nav.pagination container. The
+    // numbered page links carry no pagination words.
+    const nav = document.createElement('nav');
+    nav.className = 'pagination';
+    nav.setAttribute('role', 'navigation');
+
+    const ol = document.createElement('ol');
+    for (let p = 1; p <= 3; p++) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = 'https://example.com/sch?_pgn=' + p;
+        a.textContent = String(p);
+        li.appendChild(a);
+        ol.appendChild(li);
+    }
+    nav.appendChild(ol);
+
+    // On pages after the first, Previous is the same icon-only, aria-labelled
+    // anchor (on page 1 it is a disabled button instead).
+    const prev = document.createElement('a');
+    prev.href = 'https://example.com/sch?_pgn=1';
+    prev.setAttribute('type', 'previous');
+    prev.setAttribute('aria-label', 'Go to previous search page');
+    prev.innerHTML = '<svg aria-hidden="true"></svg>';
+    nav.appendChild(prev);
+
+    const next = document.createElement('a');
+    next.href = 'https://example.com/sch?_pgn=3';
+    next.setAttribute('type', 'next');
+    next.setAttribute('aria-label', 'Go to next search page');
+    next.innerHTML = '<svg aria-hidden="true"></svg>';
+    nav.appendChild(next);
+
+    fixture.appendChild(nav);
+
+    PageTurner.refetchLinks();
+
+    equal(PageTurner.getState().next_link, 'https://example.com/sch?_pgn=3', 'Next link should come from the aria-labelled anchor');
+    equal(PageTurner.getState().back_link, 'https://example.com/sch?_pgn=1', 'Previous link should come from the aria-labelled anchor');
+    ok(PageTurner.getState().next_form === null, 'No form fallback should be used for an anchor');
+    equal(PageTurner.getIcon(), 'both.png', 'Both-directions icon should be used');
+});
+

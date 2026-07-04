@@ -527,6 +527,18 @@
     function setButtonTarget(type, el) {
         if (!type) return;
 
+        // An anchor with a real href is a link target, not a form submit.
+        // Some sites (e.g. eBay) give an icon-only <a> no text and no
+        // rel="next", labelling the direction only via aria-label - so the
+        // text and rel scans miss it and it first surfaces here.
+        if (el.tagName === 'A') {
+            const hrefNode = el.getAttributeNode('href');
+            if (hrefNode) {
+                setLink(type, hrefNode.value);
+            }
+            return;
+        }
+
         // Prefer a real form association
         const form = (el.form instanceof HTMLFormElement && el.form) || el.closest('form');
         if (!form) return;
@@ -586,8 +598,10 @@
             if (!el || seen.has(el)) continue;
             seen.add(el);
 
-            // First check must be label (textContent)
-            const label = (el.textContent || '').trim();
+            // First check must be label. For submit/image inputs the visible
+            // label is the value attribute, not textContent (e.g. DuckDuckGo
+            // HTML paginates with <input type="submit" value="Next">).
+            const label = ((el.tagName === 'INPUT' ? el.value : el.textContent) || '').trim();
 
             // Then aria-label, then title
             const aria = (el.getAttribute && el.getAttribute('aria-label')) ? el.getAttribute('aria-label') : '';
