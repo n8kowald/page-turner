@@ -9,7 +9,7 @@ Indicates found links via page arrows (can turn these off in settings), and arro
 I created this from my wish that any website with a back or next link could be controlled from my keyboard's arrow keys.  
 
 ## Install
-https://chrome.google.com/webstore/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo
+https://chromewebstore.google.com/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo
 
 ## Settings
 Pin the icon to your bookmarks bar and click it to see the extension options. 
