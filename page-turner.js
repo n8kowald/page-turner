@@ -9,7 +9,6 @@
     let next_link = '';
     let next_page_arrow = '';
     let back_page_arrow = '';
-    let first_run = 0;
 
     // Button-driven pagination fallback (form submit)
     let back_form = null;
@@ -42,40 +41,72 @@
         : function () {
         };
 
-    function arrayHas(arr, needle) {
-        if (!arr) return false;
-        if (Array.prototype.includes) return arr.includes(needle);
-        return arr.indexOf(needle) !== -1;
+    // Preferences are fetched once at startup (single storage round-trip)
+    // and cached; unset preferences default to on.
+    let prefs = null;
+    const prefs_waiters = [];
+
+    /**
+     * Run a callback with the cached preferences, waiting for the initial
+     * storage fetch if it has not resolved yet.
+     *
+     * @param {Function} cb - Called with the {arrows, prerender} object.
+     */
+    function withPrefs(cb) {
+        if (prefs) {
+            cb(prefs);
+            return;
+        }
+        prefs_waiters.push(cb);
     }
 
-    // If show arrows preference not set: default to show
-    storage_local.get('arrows', function (items) {
+    storage_local.get(['arrows', 'prerender'], function (items) {
         items = items || {};
-        if (items.arrows === undefined) {
-            first_run = 1;
-            storage_local.set({'arrows': 1}, function () {
+
+        // Persist defaults for any preference not set yet.
+        // Unset preferences default to on (1) - popup/popup.js encodes the
+        // same rule when initialising its toggles; keep them in sync.
+        const defaults = {};
+        if (items.arrows === undefined) defaults.arrows = 1;
+        if (items.prerender === undefined) defaults.prerender = 1;
+        if (defaults.arrows !== undefined || defaults.prerender !== undefined) {
+            storage_local.set(defaults, function () {
             });
+        }
+
+        prefs = {
+            arrows: (items.arrows === undefined) ? 1 : items.arrows,
+            prerender: (items.prerender === undefined) ? 1 : items.prerender
+        };
+
+        while (prefs_waiters.length) {
+            prefs_waiters.shift()(prefs);
         }
     });
 
-    // If prerender preference not set: default to use
-    storage_local.get('prerender', function (items) {
-        items = items || {};
-        if (items.prerender === undefined) {
-            first_run = 1;
-            storage_local.set({'prerender': 1}, function () {
-            });
-        }
-    });
-
+    /**
+     * Whether a "back" target exists (link or form-submit fallback).
+     *
+     * @returns {boolean} True if back navigation is possible.
+     */
     function hasBack() {
         return back_link !== '' || !!back_form;
     }
 
+    /**
+     * Whether a "next" target exists (link or form-submit fallback).
+     *
+     * @returns {boolean} True if next navigation is possible.
+     */
     function hasNext() {
         return next_link !== '' || !!next_form;
     }
 
+    /**
+     * Pick the extension icon for the current back/next state.
+     *
+     * @returns {string} Icon filename, e.g. 'both.png' or 'inactive.png'.
+     */
     function getIcon() {
         if (hasBack() && hasNext()) {
             return 'both.png';
@@ -89,6 +120,12 @@
         return 'inactive.png';
     }
 
+    /**
+     * Pick the "clicked" feedback variant of the current icon.
+     *
+     * @param {string} direction - 'back' or 'next'.
+     * @returns {string} Icon filename, or '' if no click variant applies.
+     */
     function getClickIcon(direction) {
         const current = getIcon();
 
@@ -108,17 +145,29 @@
         return '';
     }
 
+    /**
+     * Map a pagination word to its direction.
+     *
+     * @param {string} word - Lower-cased word, e.g. 'prev' or 'forward'.
+     * @returns {string|undefined} 'back', 'next', or undefined if no match.
+     */
     function getTypeFromWord(word) {
-        if (arrayHas(back_names, word)) {
+        if (back_names.includes(word)) {
             return 'back';
         }
-        if (arrayHas(next_names, word)) {
+        if (next_names.includes(word)) {
             return 'next';
         }
         return undefined;
     }
 
-    // If link starts with #, append this to current url
+    /**
+     * If a link starts with #, resolve it against the current URL
+     * (stripping any existing anchor first).
+     *
+     * @param {string} link - Raw href value.
+     * @returns {string} Absolute or unchanged link.
+     */
     function sanitiseLink(link) {
         if (link.charAt(0) === '#') {
 
@@ -133,9 +182,38 @@
         return link;
     }
 
+    /**
+     * Only accept links that navigate to a real page. `javascript:` (and
+     * other non-http schemes) are never pagination targets and sites' CSP
+     * can block navigating to them, e.g. XenForo forums.
+     *
+     * @param {string} link - Raw href value.
+     * @returns {boolean} True if the link is a usable pagination target.
+     */
+    function isNavigableLink(link) {
+        // Empty or bare-hash hrefs require JavaScript to do anything
+        if (link === '' || link === '#') {
+            return false;
+        }
+        try {
+            const url = new URL(link, document.baseURI);
+            return url.protocol === 'http:' ||
+                url.protocol === 'https:' ||
+                url.protocol === 'file:';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    /**
+     * Store a found pagination link for the given direction.
+     *
+     * @param {string} type - 'back' or 'next'.
+     * @param {string} link - Raw href value.
+     * @returns {boolean} True if the link was accepted and stored.
+     */
     function setLink(type, link) {
-        // A single hash is not a valid link (requires JavaScript)
-        if (link === '#') {
+        if (!isNavigableLink(link)) {
             return false;
         }
 
@@ -147,6 +225,12 @@
         return true;
     }
 
+    /**
+     * Whether a link (not a form fallback) is already stored for a direction.
+     *
+     * @param {string} type - 'back' or 'next'.
+     * @returns {boolean} True if that direction's link is set.
+     */
     function linkOfTypeExists(type) {
         if (type === 'back') {
             return back_link !== '';
@@ -157,19 +241,48 @@
         return false;
     }
 
-    // send icon to background.js
+    // Set while this document is being prerendered: the latest icon to
+    // report once the document is actually shown.
+    let pending_prerender_icon = '';
+
+    /**
+     * Send the icon to background.js so it can update the toolbar.
+     *
+     * A prerendered document (e.g. the page 2 this extension asks the
+     * browser to preload) must not change the toolbar icon of the page
+     * the user is looking at; defer until the document is activated.
+     *
+     * @param {string} nextIcon - Icon filename to display.
+     */
     function updateIcon(nextIcon) {
+        if (document.prerendering) {
+            if (pending_prerender_icon === '') {
+                document.addEventListener('prerenderingchange', function () {
+                    runtime_send_message({icon: pending_prerender_icon});
+                    pending_prerender_icon = '';
+                }, {once: true});
+            }
+            pending_prerender_icon = nextIcon;
+            return;
+        }
         runtime_send_message({icon: nextIcon});
     }
 
-    // Prerender via the Speculation Rules API. The old <link rel="prerender">
-    // was removed from Chrome and silently did nothing.
+    /**
+     * Whether the browser supports the Speculation Rules API. The old
+     * <link rel="prerender"> was removed from Chrome and silently did nothing.
+     *
+     * @returns {boolean} True if speculation rules can be used.
+     */
     function supportsSpeculationRules() {
         return typeof HTMLScriptElement !== 'undefined' &&
             typeof HTMLScriptElement.supports === 'function' &&
             HTMLScriptElement.supports('speculationrules');
     }
 
+    /**
+     * Remove the injected speculation-rules script, if present.
+     */
     function removePrerenderLink() {
         const el = document.getElementById('ptpr');
         if (el && el.parentNode) {
@@ -177,6 +290,12 @@
         }
     }
 
+    /**
+     * Prerender a URL by injecting a speculation-rules script, replacing
+     * any previous rule set.
+     *
+     * @param {string} url - URL of the page to prerender.
+     */
     function addPrerenderLink(url) {
         if (!supportsSpeculationRules()) {
             return;
@@ -192,23 +311,30 @@
         (document.head || document.documentElement).appendChild(s);
     }
 
+    /**
+     * Mark available arrows visible, displaying them if the user's
+     * preference allows it.
+     */
     function showArrows() {
-        chrome.storage.local.get('arrows', function (items) {
+        withPrefs(function (p) {
 
             if (hasNext() && next_page_arrow) {
                 next_page_arrow.classList.add('visible');
-                if (items.arrows == 1 || first_run == 1) next_page_arrow.style.display = 'block';
+                if (p.arrows === 1) next_page_arrow.style.display = 'block';
             }
 
             if (hasBack() && back_page_arrow) {
                 back_page_arrow.classList.add('visible');
-                if (items.arrows == 1 || first_run == 1) back_page_arrow.style.display = 'block';
+                if (p.arrows === 1) back_page_arrow.style.display = 'block';
             }
 
         });
     }
 
-    // Remove arrow divs if not used
+    /**
+     * Remove arrow divs for directions with no capability (no link and
+     * no form).
+     */
     function updateArrows() {
         if (!back_page_arrow || !next_page_arrow) return;
 
@@ -223,32 +349,66 @@
         }
     }
 
-    // Search last links first
+    /**
+     * Store pagination targets declared with explicit rel attributes
+     * (<a rel="next">, <link rel="prev">, ...). These are unambiguous
+     * pagination semantics, so they beat the text scan.
+     */
+    function getRelLinks() {
+        // rel link types are case-insensitive in HTML, hence the `i` flag
+        const rel_selectors = {
+            back: 'a[rel~="prev" i], link[rel~="prev" i], a[rel~="previous" i], link[rel~="previous" i]',
+            next: 'a[rel~="next" i], link[rel~="next" i]'
+        };
+
+        for (const type in rel_selectors) {
+            if (linkOfTypeExists(type)) {
+                continue;
+            }
+            const el = document.querySelector(rel_selectors[type]);
+            const hrefNode = el && el.getAttributeNode('href');
+            if (hrefNode) {
+                setLink(type, hrefNode.value);
+            }
+        }
+    }
+
+    /**
+     * Whether a word uses ordinary casing: "next", "Next" or "NEXT".
+     * Oddly-cased words like "NeXT" are names, not pagination.
+     *
+     * @param {string} word - Word as it appears in the link text.
+     * @returns {boolean} True if the casing looks like pagination text.
+     */
+    function hasNormalCase(word) {
+        return word === word.toLowerCase() ||
+            word === word.toUpperCase() ||
+            word === word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }
+
+    /**
+     * Scan the page's links for pagination text and store back/next
+     * targets. Searches last links first, since pagination usually sits
+     * at the bottom of the page.
+     */
     function getLinks() {
         const links = document.links;
         const last_link_array_num = links.length - 1;
 
         // Iterate over the links in reverse order
         for (let i = last_link_array_num; i >= 0; i--) {
-            const link_text = links[i].textContent.replace(/[^a-z ]/gi, ' ').trim();
-            if (link_text === '') {
-                continue;
-            }
-            const words = link_text.split(' ');
+            const words = normaliseWords(links[i].textContent);
 
             // Links with more than two words are probably not pagination
-            if (words.length > 2) {
+            if (!words.length || words.length > 2) {
                 continue;
             }
 
-            // Match on first word
-            const word = words[0].toLowerCase();
-            if (!arrayHas(all_words, word)) {
+            // Match on first word only
+            const type = typeFromWords(words.slice(0, 1));
+            if (!type) {
                 continue;
             }
-
-            // Found!
-            const type = getTypeFromWord(word);
 
             // Set found links (if not set already)
             const hrefNode = links[i].getAttributeNode('href');
@@ -264,90 +424,167 @@
         }
     }
 
+    /**
+     * Normalise a label into words (letters + spaces only). Original
+     * casing is preserved so typeFromWords can reject odd casings.
+     *
+     * @param {string} str - Label text, e.g. from textContent or aria-label.
+     * @returns {string[]} Array of words; empty if nothing usable.
+     */
     function normaliseWords(str) {
         if (!str) return [];
-        // Keep it similar to link parsing: letters + spaces.
-        const cleaned = String(str).replace(/[^a-z ]/gi, ' ').trim().toLowerCase();
+        const cleaned = String(str).replace(/[^a-z ]/gi, ' ').trim();
         if (!cleaned) return [];
-        return cleaned.split(/\s+/).filter(Boolean);
+        return cleaned.split(/\s+/);
     }
 
-    function typeFromLabels(primary, secondary, tertiary) {
-        // Requirement: first check is the button label
-        const sources = [primary, secondary, tertiary];
-        for (let s = 0; s < sources.length; s++) {
-            const words = normaliseWords(sources[s]);
-            if (!words.length) continue;
-
-            // Match first word OR any word
-            const first = words[0];
-            if (arrayHas(all_words, first)) {
-                return getTypeFromWord(first);
-            }
-            for (let i = 0; i < words.length; i++) {
-                if (arrayHas(all_words, words[i])) {
-                    return getTypeFromWord(words[i]);
-                }
+    /**
+     * Map words to a pagination direction. Matching is case-insensitive,
+     * but oddly-cased words like "NeXT" are rejected (see hasNormalCase).
+     *
+     * @param {string[]} words - Words in their original casing.
+     * @returns {string|undefined} 'back', 'next', or undefined if no match.
+     */
+    function typeFromWords(words) {
+        for (let i = 0; i < words.length; i++) {
+            const word = words[i].toLowerCase();
+            if (all_words.includes(word) && hasNormalCase(words[i])) {
+                return getTypeFromWord(word);
             }
         }
         return undefined;
     }
 
+    /**
+     * Determine pagination direction from up to three labels, checked in
+     * order (button label first, then aria-label, then title).
+     *
+     * @param {string} primary - Button label (textContent).
+     * @param {string} secondary - aria-label value.
+     * @param {string} tertiary - title attribute value.
+     * @returns {string|undefined} 'back', 'next', or undefined if no match.
+     */
+    function typeFromLabels(primary, secondary, tertiary) {
+        const sources = [primary, secondary, tertiary];
+        for (let s = 0; s < sources.length; s++) {
+            const type = typeFromWords(normaliseWords(sources[s]));
+            if (type) return type;
+        }
+        return undefined;
+    }
+
+    /**
+     * Whether an element can be passed to requestSubmit() as a submitter.
+     *
+     * @param {Element|null} el - Element to check.
+     * @returns {boolean} True if it is a submit button.
+     */
+    function isSubmitButton(el) {
+        if (!el || !el.tagName) return false;
+        if (el.tagName === 'BUTTON') return el.type === 'submit';
+        if (el.tagName === 'INPUT') return el.type === 'submit' || el.type === 'image';
+        return false;
+    }
+
+    /**
+     * Pick the form's submit control for a direction: a submit button
+     * whose label matches the direction wins; otherwise the form's first
+     * submit control.
+     *
+     * @param {HTMLFormElement} form - Form to search.
+     * @param {string} type - 'back' or 'next'.
+     * @returns {Element|null} Submit control, or null if the form has none.
+     */
+    function findSubmitter(form, type) {
+        const controls = form.querySelectorAll('button, input');
+        let first = null;
+        for (let i = 0; i < controls.length; i++) {
+            const el = controls[i];
+            if (!isSubmitButton(el)) continue;
+            if (!first) first = el;
+
+            const label = el.tagName === 'INPUT' ? el.value : el.textContent;
+            const aria = el.getAttribute('aria-label') || '';
+            const title = el.getAttribute('title') || '';
+            if (typeFromLabels(label, aria, title) === type) {
+                return el;
+            }
+        }
+        return first;
+    }
+
+    /**
+     * Store a button's form as the submit target for a direction, if that
+     * direction has no form yet. The button itself is kept as the
+     * submitter so formaction/submitter intent is preserved. When the
+     * matched element is not itself a submit button (e.g. a form matched
+     * via its aria-label), the form's own submit button is used instead —
+     * preferring one whose label matches the direction.
+     *
+     * @param {string|undefined} type - 'back' or 'next'.
+     * @param {Element} el - Button/input element inside (or associated with) a form.
+     */
     function setButtonTarget(type, el) {
         if (!type) return;
 
         // Prefer a real form association
-        const form = el.form || el.closest('form');
+        const form = (el.form instanceof HTMLFormElement && el.form) || el.closest('form');
         if (!form) return;
+
+        let submitter = el;
+        if (!isSubmitButton(submitter)) {
+            submitter = findSubmitter(form, type);
+        }
 
         if (type === 'back' && !back_form) {
             back_form = form;
-            back_submitter = el;
+            back_submitter = submitter;
         } else if (type === 'next' && !next_form) {
             next_form = form;
-            next_submitter = el;
+            next_submitter = submitter;
         }
     }
 
-    // Look for pagination-like buttons/role=link elements and store form targets
-    function getButtons() {
-        // Reset button state each scan (pairs with refetchLinks)
-        back_form = null;
-        next_form = null;
-        back_submitter = null;
-        next_submitter = null;
+    // Likely pagination containers. Buttons inside these are the most
+    // trustworthy candidates and are scanned first; the whole page is only
+    // scanned as a fallback when these come up empty.
+    const pagination_containers = [
+        'nav',
+        '[role="navigation"]',
+        '.pagination',
+        '.pager',
+        '[id*="pagination" i]',
+        '[class*="pagination" i]',
+        '[aria-label*="pagination" i]'
+    ].join(', ');
 
-        // Prioritise likely pagination containers first.
-        const selectors = [
-            '.pagination button, .pagination [role="link"]',
-            'button',
-            '[role="link"]',
-            'input[type="submit"]',
-            'input[type="button"]',
-            // Explicit aria-label matches:
-            '[aria-label*="next" i]',
-            '[aria-label*="prev" i]',
-            '[aria-label*="previous" i]',
-            '[aria-label*="back" i]',
-            '[aria-label*="forward" i]'
-        ];
+    // Button/input/role=link elements that might drive pagination
+    const button_candidates = [
+        'button',
+        '[role="link"]',
+        'input[type="submit"]',
+        'input[type="button"]',
+        // Explicit aria-label matches:
+        '[aria-label*="next" i]',
+        '[aria-label*="prev" i]',
+        '[aria-label*="previous" i]',
+        '[aria-label*="back" i]',
+        '[aria-label*="forward" i]'
+    ].join(', ');
 
-        const seen = new Set();
-        const candidates = [];
-
-        for (let s = 0; s < selectors.length; s++) {
-            const nodes = document.querySelectorAll(selectors[s]);
-            for (let i = 0; i < nodes.length; i++) {
-                const el = nodes[i];
-                if (!el || seen.has(el)) continue;
-                seen.add(el);
-                candidates.push(el);
-            }
-        }
-
-        // Walk candidates in order; stop early if we found both.
-        for (let i = 0; i < candidates.length; i++) {
-            const el = candidates[i];
+    /**
+     * Classify candidate elements by label and store their forms as submit
+     * targets for any direction still missing.
+     *
+     * @param {NodeList} nodes - Candidate elements to inspect.
+     * @param {Set} seen - Elements already inspected (dedupes across calls).
+     * @returns {boolean} True when both directions are resolved.
+     */
+    function scanButtonCandidates(nodes, seen) {
+        for (let i = 0; i < nodes.length; i++) {
+            const el = nodes[i];
+            if (!el || seen.has(el)) continue;
+            seen.add(el);
 
             // First check must be label (textContent)
             const label = (el.textContent || '').trim();
@@ -366,11 +603,53 @@
             setButtonTarget(type, el);
 
             if (hasBack() && hasNext()) {
-                break;
+                return true;
             }
         }
+        return false;
     }
 
+    /**
+     * Scan for pagination-like buttons and store their forms as submit
+     * targets. Hybrid approach: likely pagination containers are scanned
+     * first; only if a direction is still missing does the scan broaden to
+     * the whole page. Resets button state on each scan (pairs with
+     * refetchLinks).
+     */
+    function getButtons() {
+        back_form = null;
+        next_form = null;
+        back_submitter = null;
+        next_submitter = null;
+
+        // Real links cover both directions: no form fallback needed
+        if (back_link !== '' && next_link !== '') {
+            return;
+        }
+
+        const seen = new Set();
+
+        // Fast path: only look inside likely pagination containers
+        const containers = document.querySelectorAll(pagination_containers);
+        for (let c = 0; c < containers.length; c++) {
+            if (scanButtonCandidates(containers[c].querySelectorAll(button_candidates), seen)) {
+                return;
+            }
+        }
+
+        // Fallback: broaden to the whole page so pagination in unusual
+        // markup is still found
+        scanButtonCandidates(document.querySelectorAll(button_candidates), seen);
+    }
+
+    /**
+     * Submit a pagination form, preferring requestSubmit so the
+     * formaction/submitter is respected.
+     *
+     * @param {HTMLFormElement|null} form - Form to submit.
+     * @param {Element|null} submitter - Button to submit with, if any.
+     * @returns {boolean} True if a submission was triggered.
+     */
     function submitForm(form, submitter) {
         if (!form) {
             return false;
@@ -378,7 +657,7 @@
 
         // Prefer requestSubmit so formaction/submitter is respected.
         if (typeof form.requestSubmit === 'function') {
-            if (submitter) {
+            if (isSubmitButton(submitter)) {
                 form.requestSubmit(submitter);
             } else {
                 form.requestSubmit();
@@ -395,8 +674,12 @@
         return false;
     }
 
-    // Show click feedback on an arrow, clearing it after the sprite has been
-    // seen so the state can re-fire on pages that don't unload (e.g. # links)
+    /**
+     * Show click feedback on an arrow, clearing it after the sprite has been
+     * seen so the state can re-fire on pages that don't unload (e.g. # links).
+     *
+     * @param {Element|null} arrow - Arrow div to flash.
+     */
     function flashClicked(arrow) {
         if (!arrow || !arrow.classList) return;
         arrow.classList.remove('clicked');
@@ -406,12 +689,18 @@
         }, 250);
     }
 
+    /**
+     * One-time setup: detect pagination targets, insert the arrow divs,
+     * start prerendering and set the toolbar icon. Safe to call more than
+     * once; only the first call runs.
+     */
     function init() {
         if (has_init) {
             return;
         }
         has_init = true;
 
+        getRelLinks();
         getLinks();
         getButtons();
 
@@ -437,9 +726,8 @@
         back_page_arrow = document.getElementById('pt_back_page');
 
         // Prerendering speeds up page-turning by preloading the next page
-        storage_local.get('prerender', function (items) {
-            items = items || {};
-            if (next_link !== '' && (items.prerender === 1 || first_run === 1)) {
+        withPrefs(function (p) {
+            if (next_link !== '' && p.prerender === 1) {
                 addPrerenderLink(next_link);
             }
         });
@@ -517,9 +805,14 @@
         }
     }, false);
 
+    /**
+     * Re-run pagination detection from scratch and refresh the icon and
+     * arrows. Used when the page content changes without a navigation.
+     */
     function refetchLinks() {
         back_link = '';
         next_link = '';
+        getRelLinks();
         getLinks();
         getButtons();
 
@@ -588,6 +881,12 @@
                 return;
             }
 
+            // Keep the cached preferences in sync
+            if (prefs) {
+                if (changes.arrows) prefs.arrows = changes.arrows.newValue;
+                if (changes.prerender) prefs.prerender = changes.prerender.newValue;
+            }
+
             if (changes.arrows) {
                 const show = changes.arrows.newValue === 1;
                 [back_page_arrow, next_page_arrow].forEach(function (arrow) {
@@ -609,11 +908,11 @@
         });
     }
 
-// Invalidate back/nexts if a Google search changes page results
+    // Invalidate back/nexts if a Google search changes page results
     const google_search = document.querySelector('input[name=q]');
     if (google_search) {
         google_search.addEventListener('change', function () {
-            // Until I can detect new search result completion, a one second
+            // Until I can detect new search result completion, a one-second
             // delay before fetching new links works.
             setTimeout(refetchLinks, 1000);
         }, false);

@@ -51,8 +51,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const tabId = sender && sender.tab && sender.tab.id;
   if (typeof tabId !== 'number') return;
 
-  // Don't change extension icon when pages are prerendered.
-  // In MV3, sender.tab.active is usually available; if not, we still remember state.
+  // Ignore messages from prerendered/cached documents: their icon state
+  // (e.g. page 2's "both") must not overwrite the visible page's icon.
+  // sender.tab.active can't catch this - the tab itself IS active.
+  if (sender.documentLifecycle && sender.documentLifecycle !== 'active') return;
+
   const isActive = sender.tab && sender.tab.active === true;
 
   (async () => {

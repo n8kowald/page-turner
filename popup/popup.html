@@ -1,32 +1,57 @@
-<html>
-	<head>
-		<title>Page Turner</title>
-		<link href="popup.css" rel="stylesheet" type="text/css" media="all">
-		<script type="text/javascript" src="popup.js"></script>
-	</head>
-	<body>
-	<div id="holder">
-	<h1>Page Turner</h1>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Page Turner</title>
+    <link href="popup.css" rel="stylesheet" type="text/css" media="all">
+    <script type="text/javascript" src="popup.js"></script>
+</head>
+<body>
+<div id="holder">
 
-	<h2>Page arrows <span>&lt; &gt;</span></h2>
-	<input type="radio" name="show_page_arrows" value="1" id="spa_yes"> <label for="spa_yes">Show</label>
-	&nbsp;
-	<input type="radio" name="show_page_arrows" value="0" id="spa_no"> <label for="spa_no">Hide</label>
+    <div id="header">
+        <img src="../icons/icon128.png" alt="Page turner icon" width="32" height="32">
+        <span id="title">Page Turner</span>
+    </div>
 
-	<h2>Prerender next page</h2>
-	<input type="radio" name="prerender" value="1" id="pr_yes"> <label for="pr_yes">Yes</label>
-	&nbsp;
-	<input type="radio" name="prerender" value="0" id="pr_no"> <label for="pr_no">No</label>
-	<br><br>
-	<p><a href="https://developer.chrome.com/docs/web-platform/prerender-pages" target="_blank">Prerendering</a> loads the next page for instant page turns.</p>
+    <div id="settings">
 
-	<div id="meta">
-		<p>
-			<a href="https://github.com/n8kowald/page-turner/issues" target="_blank">Report a bug</a><br>
-			Suggestions or comments <a href="http://twitter.com/n8kowald" target="_blank">@n8kowald</a>
-		</p>
-	</div>
+        <div class="row">
+            <div class="row_text">
+                <span class="row_label">Page arrows</span>
+                <span class="row_help">Show
+                    <svg class="pt_chevron" viewBox="0 0 30 62"><path d="M23 9L6 31l17 22" fill="none" stroke="#6f6f6f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <svg class="pt_chevron" viewBox="0 0 30 62"><path d="M7 9l17 22L7 53" fill="none" stroke="#6f6f6f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    controls on the page</span>
+            </div>
+            <button id="arrows_toggle" class="toggle" aria-pressed="true" aria-label="Page arrows">
+                <span class="knob"></span>
+            </button>
+        </div>
 
-	</div>
-	</body>
+        <div class="row_divider"></div>
+
+        <div class="row" id="prerender_row">
+            <div class="row_text">
+                <span class="row_label">Instant page turns</span>
+                <span class="row_help" id="pr_info"><a href="https://developer.chrome.com/docs/web-platform/prerender-pages" target="_blank">Prerendering</a> the next page makes page turns instant.</span>
+            </div>
+            <button id="prerender_toggle" class="toggle" aria-pressed="true" aria-label="Instant page turns">
+                <span class="knob"></span>
+            </button>
+        </div>
+
+        <div id="pr_unsupported" hidden>
+            <span class="banner_icon">🌐</span>
+            <span>Your browser doesn't support <a href="https://developer.chrome.com/docs/web-platform/prerender-pages" target="_blank">prerendering</a>, so this setting has no effect.</span>
+        </div>
+
+    </div>
+
+    <div id="footer_divider"></div>
+    <div id="meta">
+        🐛 <a href="https://github.com/n8kowald/page-turner/issues/new" target="_blank">Not working on a site? Report it</a>
+    </div>
+
+</div>
+</body>
 </html>

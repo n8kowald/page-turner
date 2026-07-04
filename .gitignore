@@ -1,0 +1,6 @@
+# Build artifacts
+package-page-turner-*.zip
+
+# OS / editor
+.DS_Store
+.idea/

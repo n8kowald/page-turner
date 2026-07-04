@@ -2,52 +2,52 @@
 
 	document.addEventListener('DOMContentLoaded', function() {
 
-		var spa_yes = document.getElementById('spa_yes'),
-			spa_no = document.getElementById('spa_no'),
-			pr_yes = document.getElementById('pr_yes'),
-			pr_no = document.getElementById('pr_no');
+		var arrows_toggle = document.getElementById('arrows_toggle'),
+			prerender_toggle = document.getElementById('prerender_toggle');
 
-		chrome.storage.local.get('arrows', function(items) {
-			updateArrowRadios(items.arrows);
-		});
-		chrome.storage.local.get('prerender', function(items) {
-			updatePrerenderRadios(items.prerender);
-		});
-
-		function saveOptions()
-		{
-			var arrow_pref = (spa_yes.checked) ? 1 : 0,
-				prerender_pref = (pr_yes.checked) ? 1 : 0;
-			// page-turner.js listens for storage changes and shows/hides
-			// arrows immediately (chrome.tabs.executeScript was removed in MV3)
-			chrome.storage.local.set({
-				'arrows':arrow_pref,
-				'prerender':prerender_pref
-			}, function() {});
+		// Grey out the prerender option in browsers that don't support the
+		// Speculation Rules API (e.g. Brave and Firefox disable it)
+		var prerender_supported = typeof HTMLScriptElement.supports === 'function' &&
+			HTMLScriptElement.supports('speculationrules');
+		if (!prerender_supported) {
+			prerender_toggle.disabled = true;
+			setToggle(prerender_toggle, false);
+			document.getElementById('prerender_row').classList.add('unsupported');
+			document.getElementById('pr_unsupported').hidden = false;
+			document.getElementById('pr_info').hidden = true;
 		}
 
-		function updateArrowRadios(arrow)
-		{
-			if (arrow == 1 || arrow == undefined) {
-				spa_yes.checked = true;
-			} else {
-				spa_no.checked = true;
+		// Unset preferences default to on (1) - page-turner.js encodes the
+		// same rule (and persists the defaults); keep them in sync.
+		chrome.storage.local.get(['arrows', 'prerender'], function(items) {
+			items = items || {};
+			setToggle(arrows_toggle, items.arrows == 1 || items.arrows == undefined);
+			if (prerender_supported) {
+				setToggle(prerender_toggle, items.prerender == 1 || items.prerender == undefined);
 			}
-		}
+		});
 
-		function updatePrerenderRadios(prerender)
+		function setToggle(button, on)
 		{
-			if (prerender == 1 || prerender == undefined) {
-				pr_yes.checked = true;
-			} else {
-				pr_no.checked = true;
-			}
+			button.setAttribute('aria-pressed', on ? 'true' : 'false');
 		}
 
-		spa_yes.onclick = function() { saveOptions(); }
-		spa_no.onclick = function() { saveOptions(); }
-		pr_yes.onclick = function() { saveOptions(); }
-		pr_no.onclick = function() { saveOptions(); }
+		function toggleIsOn(button)
+		{
+			return button.getAttribute('aria-pressed') === 'true';
+		}
+
+		// page-turner.js listens for storage changes and applies the new
+		// preference to open tabs immediately
+		arrows_toggle.onclick = function() {
+			setToggle(arrows_toggle, !toggleIsOn(arrows_toggle));
+			chrome.storage.local.set({'arrows': toggleIsOn(arrows_toggle) ? 1 : 0}, function() {});
+		}
+
+		prerender_toggle.onclick = function() {
+			setToggle(prerender_toggle, !toggleIsOn(prerender_toggle));
+			chrome.storage.local.set({'prerender': toggleIsOn(prerender_toggle) ? 1 : 0}, function() {});
+		}
 
 	});
 
