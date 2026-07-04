@@ -1,16 +1,17 @@
 # Page Turner - Chrome extension 
-Detects Back and Next links in webpage pagination and allows you to use your keyboard's left/right arrow keys to go back/next.  
-
-The extension indicates found links via page arrows (can turn these off in settings), and arrows inside the extension icon itself.
-
-I created this from my wish that any website with a back or next link could be controlled from my keyboard's arrow keys.  
+Navigate paginated webpages with your keyboard's arrow keys.  
+Perfect for search results, image galleries and more.
 
 <img src="artwork/promotional-1280x800.png" alt="Page Turner: turn webpages with your arrow keys" width="820">
+
+Indicates found links via page arrows (can turn these off in settings), and arrows inside the extension icon itself.
+
+I created this from my wish that any website with a back or next link could be controlled from my keyboard's arrow keys.  
 
 ## Install
 https://chrome.google.com/webstore/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo
 
-## Extension options
+## Settings
 Pin the icon to your bookmarks bar and click it to see the extension options. 
 
 <img src="artwork/extension-options.jpg" alt="Page Turner: extension options" width="360">
@@ -20,10 +21,10 @@ The Speculation Rules API loads the Next detected page in the background so that
 It is effectively a Chromium-only feature today. It's a Chrome-originated API that's not yet a finished web standard, so support splits cleanly along engine lines — Chromium ships it, WebKit has it built but dormant, Gecko doesn't have it at all.
 https://developer.chrome.com/docs/web-platform/prerender-pages - the spec.
  
-### Support
+### Supported browsers
 Chrome, Edge, Opera and Vivaldi
 
-### No support
+### Not supported browsers
 Brave, Firefox, Safari
 
 ## Not working?
