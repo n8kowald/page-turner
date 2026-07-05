@@ -2,7 +2,7 @@
 Navigate paginated webpages with your keyboard's arrow keys.  
 Perfect for search results, image galleries and more.
 
-<img src="artwork/promotional-1280x800.png" alt="Page Turner: turn webpages with your arrow keys" width="820">
+<img src="artwork/chrome-marquee-promo-1400x560.png" alt="Page Turner: turn webpages with your arrow keys" width="820">
 
 Indicates found links via page arrows (can turn these off in settings), and arrows inside the extension icon itself.
 
