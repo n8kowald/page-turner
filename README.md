@@ -2,7 +2,7 @@
 Navigate paginated webpages with your keyboard's arrow keys.  
 Perfect for search results, image galleries and more.
 
-<img src="artwork/chrome-marquee-promo-1400x560.png" alt="Page Turner: turn webpages with your arrow keys" width="820">
+<img src="artwork/chrome-marquee-promo-1400x560.jpg" alt="Page Turner: turn webpages with your arrow keys" width="820">
 
 Indicates found links via page arrows (can turn these off in settings), and arrows inside the extension icon itself.
 
@@ -14,7 +14,7 @@ https://chromewebstore.google.com/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcm
 ## Settings
 Pin the icon to your bookmarks bar and click it to see the extension options. 
 
-<img src="artwork/extension-options.jpg" alt="Page Turner: extension options" width="360">
+<img src="artwork/chrome-screenshot-options-1280x800.jpg" alt="Page Turner: extension options" width="820">
 
 ## Preloading pages
 The Speculation Rules API loads the Next detected page in the background so that when you click -> on the keyboard, the page loads instantly.   
