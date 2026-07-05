@@ -1,3 +1,14 @@
+/*
+ * Page Turner - Navigate paginated webpages with your keyboard's arrow keys.
+ * Copyright (C) 2012-2026 Nathan Kowald
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version. See the LICENSE file for details.
+ */
+
 // MV3 service worker background script
 
 // In MV3, the service worker can be suspended at any time, so we keep a small
