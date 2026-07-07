@@ -30,7 +30,6 @@ Brave, Firefox, Safari
 ## Permissions
 This extension requires the following permissions:
 
-- **Tabs**: To update the extension icon when Previous/Next links are found on the active tab
 - **Storage**: To save your settings and remember per-tab link detection state
 - **Host Access**: To let the content script scan each page you visit for Previous/Next links
 
@@ -57,6 +56,7 @@ With every change, I check these websites to make sure back/next link detection 
 - https://forums.macrumors.com/threads/what-to-expect-from-apples-big-week-iphone-17e-low-cost-macbook-new-ipads-and-more.2478339
 - https://old.reddit.com/r/all/
 - https://github.com/search?q=test&type=issues
+- https://www.ozbargain.com.au
 - https://au.search.yahoo.com/search?p=test (search input autofocused so need to click outside)
 
 ## License
