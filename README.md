@@ -1,4 +1,7 @@
 # Page Turner - Chrome extension 
+
+[![Chrome Web Store Version](https://img.shields.io/chrome-web-store/v/fpbddhncmmhkaofhcnkjgcdbgcmomebo)](https://chromewebstore.google.com/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo) [![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/fpbddhncmmhkaofhcnkjgcdbgcmomebo)](https://chromewebstore.google.com/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo) [![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/fpbddhncmmhkaofhcnkjgcdbgcmomebo)](https://chromewebstore.google.com/detail/page-turner/fpbddhncmmhkaofhcnkjgcdbgcmomebo)
+
 Navigate paginated webpages with your keyboard's arrow keys.  
 Perfect for search results, image galleries and more.
 
